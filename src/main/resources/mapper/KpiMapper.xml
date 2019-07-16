@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jc.equipment.dao.KpiMapper">
+
+    <select id="getEquipmentList" resultType="map">
+        select e.equipment_ID,e.equipment_name,e.equipment_date,d.department_name from eq_equipment e
+        left join eq_department d on e.equipment_departmentID = d.department_ID
+        order by e.equipment_date asc
+    </select>
+
+    <select id="getCareList" resultType="map">
+        select c.*,u.user_name from eq_careplans c
+        left join eq_user u on c.carePlans_userID = u.user_ID
+    </select>
+
+    <select id="getSuccessCare" resultType="map">
+        select * from eq_carerecord
+    </select>
+
+    <select id="getRepairList" resultType="map">
+        select * from eq_repairplans
+    </select>
+
+    <select id="getCare" resultType="map">
+        select c.*,u.user_name,d.department_name from eq_careplans c
+        left join eq_user u on c.carePlans_userID = u.user_ID
+        left join eq_equipment e on c.carePlans_equipmentID = e.equipment_ID
+        left join eq_department d on e.equipment_departmentID = d.department_ID
+        where c.carePlans_equipmentID=#{equipmentID} and c.carePlans_year=#{year}
+    </select>
+
+    <select id="getSuccess" resultType="String">
+        select careRecord_date from eq_carerecord
+        where careRecord_equipmentID = #{equipmentID} and careRecord_year = #{year} and careRecord_month = #{month}
+    </select>
+
+</mapper>

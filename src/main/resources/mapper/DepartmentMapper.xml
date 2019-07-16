@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jc.equipment.dao.DepartmentMapper">
+
+    <select id="getDepartmentList" resultType="map">
+        select * from eq_department
+    </select>
+
+    <select id="getMaxNumber" resultType="int">
+        select max(department_ID) from eq_department
+    </select>
+
+    <insert id="insertDepartment">
+        insert into eq_department(department_ID,department_name) values(#{userID},#{department_name})
+    </insert>
+
+    <update id="updateDepartment">
+        update eq_department set department_name = #{department_name} where department_ID = #{userID}
+    </update>
+
+    <delete id="deleteDepartment">
+        delete from eq_department where department_ID in
+        <foreach collection="list" item="li" open="("
+                 separator="," close=")">
+            #{li.ID}
+        </foreach>
+    </delete>
+</mapper>

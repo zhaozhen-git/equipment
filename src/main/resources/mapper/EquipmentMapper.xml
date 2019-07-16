@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jc.equipment.dao.EquipmentMapper">
+    
+    <select id="getEquipmentList" resultType="map">
+        select eq.*,u.user_name,d.department_name,d.department_ID from eq_equipment eq
+        left join eq_user u on u.user_departmentID = eq.equipment_departmentID
+        left join eq_department d on u.user_departmentID = d.department_ID
+        <if test="username!='901001'">
+            where u.user_ID = #{username}
+        </if>
+        <if test="data!=null and data!=''">
+            where eq.equipment_name like CONCAT('%',#{data},'%') or d.department_name like CONCAT('%',#{data},'%') or u.user_name like CONCAT('%',#{data},'%')
+        </if>
+    </select>
+    
+    <select id="getAccount" resultType="map">
+        select u.user_name,r.name from eq_user u left join user_role ur on u.user_ID = ur.user_ID left join role r on ur.role_ID = r.id  where u.user_ID=#{name}
+    </select>
+
+    <select id="boolEquipment" resultType="int">
+        select count(*) from eq_equipment where equipment_ID = #{equipment_ID}
+    </select>
+
+    <insert id="insertEquipment">
+        insert into eq_equipment(
+        <trim suffixOverrides=",">
+            <if test="equipment_ID!='' and equipment_ID!=null">
+                equipment_ID,
+            </if>
+            <if test="equipment_name!='' and equipment_name!=null">
+                equipment_name,
+            </if>
+            <if test="equipment_type!='' and equipment_type!=null">
+                equipment_type,
+            </if>
+            <if test="equipment_size!='' and equipment_size!=null">
+                equipment_size,
+            </if>
+            <if test="equipment_company!='' and equipment_company!=null">
+                equipment_company,
+            </if>
+            <if test="departmentID!='' and departmentID!=null">
+                equipment_departmentID,
+            </if>
+            <if test="userID!='' and userID!=null">
+                equipment_userID,
+            </if>
+            <if test="date!='' and date!=null">
+                equipment_date,
+            </if>
+            <if test="remark!='' and remark!=null">
+                equipment_remark,
+            </if>
+            <if test="file!='' and file!=null">
+                equipment_file,
+            </if>
+        </trim>
+        ) values(
+        <trim suffixOverrides=",">
+            <if test="equipment_ID!='' and equipment_ID!=null">
+                #{equipment_ID},
+            </if>
+            <if test="equipment_name!='' and equipment_name!=null">
+                #{equipment_name},
+            </if>
+            <if test="equipment_type!='' and equipment_type!=null">
+                #{equipment_type},
+            </if>
+            <if test="equipment_size!='' and equipment_size!=null">
+                #{equipment_size},
+            </if>
+            <if test="equipment_company!='' and equipment_company!=null">
+                #{equipment_company},
+            </if>
+            <if test="departmentID!='' and departmentID!=null">
+                #{departmentID},
+            </if>
+            <if test="userID!='' and userID!=null">
+                #{userID},
+            </if>
+            <if test="date!='' and date!=null">
+                #{date},
+            </if>
+            <if test="remark!='' and remark!=null">
+                #{remark},
+            </if>
+            <if test="file!='' and file!=null">
+                #{file},
+            </if>
+        </trim>
+        )
+    </insert>
+
+
+    <update id="updateEquipment">
+        update eq_equipment set
+        <trim suffixOverrides=",">
+            <if test="equipment_name!='' and equipment_name!=null">
+                equipment_name = #{equipment_name},
+            </if>
+            <if test="equipment_type!='' and equipment_type!=null">
+                equipment_type = #{equipment_type},
+            </if>
+            <if test="equipment_size!='' and equipment_size!=null">
+                equipment_size = #{equipment_size},
+            </if>
+            <if test="equipment_company!='' and equipment_company!=null">
+                equipment_company = #{equipment_company},
+            </if>
+            <if test="departmentID!='' and departmentID!=null">
+                equipment_departmentID = #{departmentID},
+            </if>
+            <if test="userID!='' and userID!=null">
+                equipment_userID = #{userID},
+            </if>
+            <if test="date!='' and date!=null">
+                equipment_date = #{date},
+            </if>
+            <if test="remark!='' and remark!=null">
+                equipment_remark = #{remark},
+            </if>
+            <if test="file!='' and file!=null">
+                equipment_file = #{file},
+            </if>
+        </trim>
+        where equipment_ID = #{equipment_ID}
+    </update>
+
+
+    <delete id="deleteEquipment">
+        delete from eq_equipment where equipment_ID in
+        <foreach collection="list" item="li" open="("
+                 separator="," close=")">
+            #{li.ID}
+        </foreach>
+    </delete>
+
+
+    <select id="getCareList" resultType="map">
+        select * from eq_care where care_equipmentID = #{equipmentID} and care_state = "0"
+    </select>
+
+
+    <select id="getCareNum" resultType="String">
+        select max(care_ID) from eq_care where care_equipmentID = #{equipment_ID}
+    </select>
+
+    <insert id="insertCare">
+        insert into eq_care(care_equipmentID,care_ID,care_name,care_state) values(#{equipment_ID},#{care_ID},#{careData},"0")
+    </insert>
+
+    <update id="updateCare">
+        update eq_care set care_name = #{careData} where care_equipmentID = #{equipment_ID} and care_ID = #{care_ID}
+    </update>
+
+    <select id="getEquipmentCare" resultType="map">
+        select * from eq_equipment
+        <if test="user_ID!=null and user_ID!='' and user_ID!='901001'">
+            where equipment_userID = #{user_ID}
+        </if>
+    </select>
+
+    <select id="getList" resultType="map">
+        select * from  eq_care where care_equipmentID = #{equipment_ID} and care_state = 0
+    </select>
+
+    <update id="deleteCareList">
+        update eq_care set care_state = 1
+        <where>
+            <foreach collection="list" item="li" open="( " separator=") or (" close=" )">
+                care_equipmentID = #{li.equipmentID} and care_ID = #{li.care_ID}
+            </foreach>
+        </where>
+    </update>
+
+
+    <insert id="insertCareList">
+        insert into eq_care(care_equipmentID,care_ID,care_name,care_state) values
+        <foreach collection="list" item="li" separator=",">
+            (
+            #{li.equipmentID},#{li.care_ID},#{li.care_name},"0"
+            )
+        </foreach>
+    </insert>
+
+    <select id="boolCare" resultType="String">
+        select carePlans_year from eq_careplans where carePlans_equipmentID = #{equipment_ID} and carePlans_year = #{year}
+    </select>
+
+    <update id="updateCarePlan">
+        update eq_careplans set
+        <trim suffixOverrides=",">
+            <if test="Jan!=null">
+                carePlans_Jan = #{Jan},
+            </if>
+            <if test="Feb!=null">
+                carePlans_Feb = #{Feb},
+            </if>
+            <if test="March!=null">
+                carePlans_March = #{March},
+            </if>
+            <if test="April!=null">
+                carePlans_April = #{April},
+            </if>
+            <if test="May!=null">
+                carePlans_May = #{May},
+            </if>
+            <if test="June!=null">
+                carePlans_June = #{June},
+            </if>
+            <if test="July!=null">
+                carePlans_July = #{July},
+            </if>
+            <if test="August!=null">
+                carePlans_August = #{August},
+            </if>
+            <if test="Sept!=null">
+                carePlans_Sept = #{Sept},
+            </if>
+            <if test="Oct!=null">
+                carePlans_Oct = #{Oct},
+            </if>
+            <if test="Nov!=null">
+                carePlans_Nov = #{Nov},
+            </if>
+            <if test="Dec!=null">
+                carePlans_Dec = #{Dec},
+            </if>
+            <if test="file!=null">
+                carePlans_file = #{file},
+            </if>
+        </trim>
+        where carePlans_equipmentID = #{equipment_ID} and carePlans_year = #{year}
+    </update>
+
+    <insert id="insertCarePlan">
+        insert into eq_careplans(
+        <trim suffixOverrides=",">
+            carePlans_equipmentID,carePlans_year,carePlans_userID,
+            <if test="Jan!=null and Jan!=''">
+                carePlans_Jan,
+            </if>
+            <if test="Feb!=null and Feb!=''">
+                carePlans_Feb,
+            </if>
+            <if test="March!=null and March!=''">
+                carePlans_March,
+            </if>
+            <if test="April!=null and April!=''">
+                carePlans_April,
+            </if>
+            <if test="May!=null and May!=''">
+                carePlans_May,
+            </if>
+            <if test="June!=null and June!=''">
+                carePlans_June,
+            </if>
+            <if test="July!=null and July!=''">
+                carePlans_July,
+            </if>
+            <if test="August!=null and August!=''">
+                carePlans_August,
+            </if>
+            <if test="Sept!=null and Sept!=''">
+                carePlans_Sept,
+            </if>
+            <if test="Oct!=null and Oct!=''">
+                carePlans_Oct,
+            </if>
+            <if test="Nov!=null and Nov!=''">
+                carePlans_Nov,
+            </if>
+            <if test="Dec!=null and Dec!=''">
+                carePlans_Dec,
+            </if>
+            <if test="file!=null and file!=''">
+                carePlans_file,
+            </if>
+        </trim>
+        ) values(
+        <trim suffixOverrides=",">
+            #{equipment_ID},#{year},#{userID},
+            <if test="Jan!=null and Jan!=''">
+                #{Jan},
+            </if>
+            <if test="Feb!=null and Feb!=''">
+                #{Feb},
+            </if>
+            <if test="March!=null and March!=''">
+                #{March},
+            </if>
+            <if test="April!=null and April!=''">
+                #{April},
+            </if>
+            <if test="May!=null and May!=''">
+                #{May},
+            </if>
+            <if test="June!=null and June!=''">
+                #{June},
+            </if>
+            <if test="July!=null and July!=''">
+                #{July},
+            </if>
+            <if test="August!=null and August!=''">
+                #{August},
+            </if>
+            <if test="Sept!=null and Sept!=''">
+                #{Sept},
+            </if>
+            <if test="Oct!=null and Oct!=''">
+                ,#{Oct},
+            </if>
+            <if test="Nov!=null and Nov!=''">
+                #{Nov},
+            </if>
+            <if test="Dec!=null and Dec!=''">
+                #{Dec},
+            </if>
+            <if test="file!=null and file!=''">
+                #{file},
+            </if>
+        </trim>
+        )
+    </insert>
+
+
+    <select id="getCarePlans" resultType="map">
+        select * from eq_careplans where carePlans_equipmentID = #{equipmentID} and carePlans_year = #{year}
+    </select>
+
+    <delete id="deleteCarePlans">
+        delete from eq_carePlans where carePlans_equipmentID = #{id} and carePlans_year = #{year}
+    </delete>
+
+
+    <select id="getEquipmentTime" resultType="map">
+        select c.*,u.user_name from eq_carerecord c
+        left join eq_user u on c.careRecord_userID = u.user_ID
+        where c.careRecord_equipmentID = #{equipmentID}
+        order by c.careRecord_date asc
+    </select>
+
+    <select id="getFile" resultType="map">
+        select equipment_file from eq_equipment where equipment_ID = #{equipmentID}
+    </select>
+</mapper>

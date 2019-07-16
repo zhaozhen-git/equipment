@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jc.equipment.dao.CarePlansMapper">
+
+    <select id="getCarePlansList" resultType="map">
+        select c.*,e.equipment_name,d.department_name,d.department_ID,u.user_name from eq_careplans c
+        left join eq_equipment e on c.carePlans_equipmentID = e.equipment_ID
+        left join eq_department d on e.equipment_departmentID = d.department_ID
+        left join eq_user u on c.carePlans_userID = u.user_ID
+        <if test="userID!='' and userID!=null and userID!='901001'">
+            where carePlans_userID = #{userID}
+        </if>
+    </select>
+
+    <update id="successCarePlansState">
+        update eq_careplans set ${month}=1 where carePlans_equipmentID = #{carePlans_equipmentID} and carePlans_year = #{year}
+    </update>
+
+    <update id="unSuccessCarePlansState">
+        update eq_careplans set ${month}=0 where carePlans_equipmentID = #{carePlans_equipmentID} and carePlans_year = #{year}
+    </update>
+
+    <insert id="insertCareRecord">
+        insert into eq_carerecord(careRecord_equipmentID,careRecord_care,careRecord_date,careRecord_year,careRecord_month,careRecord_userID)
+        values(#{carePlans_equipmentID},#{data},#{date},#{year},#{careMonth},#{userID})
+    </insert>
+
+    <delete id="deleteCareRecord">
+        delete from eq_carerecord where careRecord_equipmentID = #{carePlans_equipmentID} and careRecord_year = #{year} and careRecord_month = #{careMonth}
+    </delete>
+
+    <select id="getCareRecord" resultType="map">
+        select c.*,u.user_name,d.department_name from eq_carerecord c
+        left join eq_user u on c.careRecord_userID = u.user_ID
+        left join eq_department d on u.user_departmentID = d.department_ID
+        <if test="userID!=null and userID!='' and userID!='901001'">
+            careRecord_userID = #{userID}
+        </if>
+    </select>
+
+    <delete id="cancelRepairBill">
+        delete from eq_repairplans
+        where repairPlans_equipmentID = #{carePlans_equipmentID} and repairPlans_careYear=#{year} and repairPlans_careMonth=#{month}
+    </delete>
+
+</mapper>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jc.equipment.dao.RepairPlansMapper">
+
+
+    <select id="getRepairPlansList" resultType="map">
+        select * from eq_repairplans
+        <if test="userID!=null and userID!='' and userID!='901001'">
+            where repairPlans_userID = #{userID}
+        </if>
+    </select>
+
+    <insert id="insertRepairPlans">
+        insert into eq_repairplans(repairPlans_equipmentID,repairPlans_careYear,repairPlans_careMonth,repairPlans_year,repairPlans_departmentID,repairPlans_des,repairPlans_userID,repairPlans_state)
+        values(#{equipment_ID},#{careYear},#{careMonth},#{year},#{department_ID},#{repairReason},#{user_ID},"0")
+    </insert>
+
+    <select id="LookRepairPlans" resultType="map">
+        select r.*,d.department_name,u.user_name from eq_repairplans r
+         left join eq_department d on r.repairPlans_departmentID = d.department_ID
+         left join eq_user u on r.repairPlans_userID = u.user_ID
+         where repairPlans_equipmentID = #{carePlans_equipmentID} and repairPlans_careYear = #{year} and repairPlans_careMonth = #{month}
+    </select>
+
+    <select id="getWaitRepair" resultType="map">
+        select r.*,u.user_name,d.department_name from eq_repairplans r
+        left join eq_user u on r.repairPlans_userID = u.user_ID
+        left join eq_department d on r.repairPlans_departmentID=d.department_ID
+        where r.repairPlans_state!=2
+    </select>
+
+    <update id="deleteRepair">
+        update eq_repairplans set repairPlans_state = '0',repairPlans_successDate='',repairPlans_reason=''
+        where repairPlans_equipmentID = #{repairPlans_equipmentID} and repairPlans_careYear = #{repairPlans_careYear} and repairPlans_careMonth=#{repairPlans_careMonth}
+    </update>
+
+    <update id="repairBill">
+        update eq_repairplans set repairPlans_operatorID=#{repairPlans_operatorID},repairPlans_state='1',repairPlans_successDate=#{date},repairPlans_reason=#{reason},repairPlans_partID = #{partData}
+        where repairPlans_equipmentID=#{repairPlans_equipmentID} and repairPlans_careYear=#{repairPlans_careYear} and repairPlans_careMonth=#{repairPlans_careMonth}
+    </update>
+
+    <select id="getUsername" resultType="String">
+        select user_name from eq_user where user_ID = #{repairPlans_operatorID}
+    </select>
+
+    <select id="getRepairRecord" resultType="map">
+        select r.repairRecord_equipmentID,rp.repairPlans_year,d.department_name,rp.repairPlans_des,rp.repairPlans_operatorID,u.user_name,rp.repairPlans_successDate,rp.repairPlans_reason from eq_repairrecord r
+        left join eq_repairplans rp on r.repairRecord_equipmentID = rp.repairPlans_equipmentID and r.repairRecord_year = rp.repairPlans_careYear and r.repairRecord_month = rp.repairPlans_careMonth
+        left join eq_user u on rp.repairPlans_userID = u.user_ID
+        left join eq_department d on rp.repairPlans_departmentID = d.department_ID
+    </select>
+
+    <update id="changeState">
+        update eq_repairplans set repairPlans_state='2'
+        where repairPlans_equipmentID = #{idBill} and repairPlans_careYear = #{yearBill} and repairPlans_careMonth = #{monthBill}
+    </update>
+
+    <insert id="insertRepairBill">
+        insert into eq_repairrecord(repairRecord_equipmentID,repairRecord_des,repairRecord_date,repairRecord_state,repairRecord_userID,repairRecord_year,repairRecord_month)
+        values(#{idBill},#{describe},#{receiveDate},#{state},#{receiver},#{yearBill},#{monthBill})
+    </insert>
+
+    <select id="getOperator" resultType="String">
+        select user_name from eq_user where user_ID = #{operatorID}
+    </select>
+
+    <select id="getEquipmentName" resultType="String">
+        select equipment_name from eq_equipment where equipment_ID = #{repairPlans_equipmentID}
+    </select>
+
+    <select id="getEquipmentID" resultType="map">
+        select equipment_ID from eq_equipment where equipment_name = #{equipmentName}
+    </select>
+
+    <select id="getList" resultType="map">
+        select r.*,d.department_name,u.user_name from eq_repairplans r
+        left join eq_department d on r.repairPlans_departmentID = d.department_ID
+        left join eq_user u on r.repairPlans_userID = u.user_ID
+        where (r.repairPlans_equipmentID,r.repairPlans_state) in
+        <foreach collection="list" item="li" open="(" close=")" separator=",">
+            (#{li.equipmentID},'2')
+        </foreach>
+    </select>
+
+    <select id="getPartName" resultType="map">
+        select eq_partName from eq_part
+        where eq_partID in
+        <foreach collection="list" item="li" open="(" close=")" separator=",">
+            #{li.partID}
+        </foreach>
+    </select>
+</mapper>

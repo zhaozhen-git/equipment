@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jc.equipment.dao.PartMapper">
+
+    <select id="getPartList" resultType="map">
+        select * from eq_part where eq_state=0
+    </select>
+
+    <select id="getNum" resultType="String">
+        select max(eq_partID) from eq_part
+    </select>
+
+    
+    <insert id="insertPart">
+        insert into eq_part(eq_partID,eq_partName,eq_partDes) values(#{num},#{partName},#{partDes})
+    </insert>
+
+    <update id="deletePart">
+        update eq_part set eq_state = 1 where eq_partID in
+        <foreach collection="list" item="li" separator="," close=")" open="(">
+            #{li.ID}
+        </foreach>
+    </update>
+
+    <select id="getPart" resultType="map">
+        select * from eq_part
+    </select>
+</mapper>

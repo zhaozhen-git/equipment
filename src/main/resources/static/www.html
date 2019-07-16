@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>设备保养功能页</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <link rel="stylesheet" type="text/css" href="css/bootstrap.css">
+  <script src="js/jquery-1.11.3.js"></script>
+  <script src="js/bootstrap.js"></script>
+  <style>
+    /*整体样式*/
+    body{
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .modal-content{
+      width: 1500px;
+      height: auto;
+      right: 500px;
+    }
+    /*保养项样式*/
+    img:hover{
+      cursor:pointer;
+    }
+    .btn-group span{
+      margin-top: 5px;
+    }
+    .btn-group button{
+      margin-right: 5px;
+    }
+    .span_style{
+      border: 4px solid #93D1FF;
+      border-radius: 5px;
+      width:800px;
+      height: 150px;
+      margin-top: 10px;
+    }
+    #initNewMte{
+      border: 1px solid #C9C9C9;
+      margin: 20px 10px 0 10px;
+      float: left;
+    }
+    /*月份框样式*/
+    .Months-group{
+      margin-top:20px;
+    }
+    /*#January,#February,#March,#April,#May,#June,#July,#August,#September,#October,#November,#December*/
+    .months>div{
+      display: inline-block;
+      border: 3px solid #93D1FF;
+      border-radius: 5px;
+      width: 420px;
+      height: 120px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      margin-right: 15px;
+      margin-bottom: 15px;
+    }
+    .months b{
+      float: left;
+      width: 37px;
+      height: 22px;
+      margin-top:8px;margin-left:5px;
+      background-color:#ec971f;
+      border-radius: 5px;
+      font-size: 18px;
+    }
+    /*月份内保养项样式*/
+    #newAddMte{
+      margin: 2px;
+      background-color: #f7ecb5;
+      margin-left: 5px;
+      margin-top: 5px;
+      float: left;
+    }
+    .displayChange{
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<button class="btn btn-success btn-lg" data-toggle="modal" data-target="#Modal_maintenance">显示模态框</button>
+<div class="modal fade" id="Modal_maintenance" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <a href="javascript:location.reload();" class="close" aria-label="Close"><span aria-hidden="true">×</span></a>
+        <h4 class="modal-title">保养管理记录页</h4>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid" style="margin-left: 30px;">
+          <div class="btn-group">
+            <span style="float: left;">保养项操作按钮：</span>
+            <button type="button" class="btn btn-success" data-toggle="modal" data-target="#Maintenance_new" id="new_btn" style="border-radius: 5px;">新增</button>
+            <button type="button" class="btn btn-danger" id="showDelBtn" style="border-radius: 5px;" onclick="showDeleteBtn()">删除</button>
+          </div>
+          <!--保养项目组-->
+          <div class="row">
+            <div class="col-lg-12 col-md-6 Maintenance-group">
+              <div class="span_style" >
+              </div>
+            </div>
+          </div>
+          <!--月份项目组-->
+          <div class="row">
+            <div class="col-lg-12 col-md-6 Months-group">
+              <div class="months">
+                <div id="January" ondrop="drop(this)" ondragover="allowDrop(event,this)" value="1月">
+                  <b id="mon">一月</b>
+                </div>
+                <div id="February" ondrop="drop(this)" ondragover="allowDrop(event,this)" value="2月">
+                  <b id="mon">二月</b>
+                </div>
+                <div id="March" ondrop="drop(this)" ondragover="allowDrop(event,this)" value="3月">
+                  <b id="mon">三月</b>
+                </div>
+                <div id="April" ondrop="drop(this)" ondragover="allowDrop(event,this)" value="4月">
+                  <b id="mon">四月</b>
+                </div>
+                <div id="May" ondrop="drop(this)" ondragover="allowDrop(event,this)" value="5月">
+                  <b id="mon">五月</b>
+                </div>
+                <div id="June" ondrop="drop(this)" ondragover="allowDrop(event,this)" value="6月">
+                  <b id="mon">六月</b>
+                </div>
+                <div id="July" ondrop="drop(this)" ondragover="allowDrop(event,this)" value="7月">
+                  <b id="mon">七月</b>
+                </div>
+                <div id="August" ondrop="drop(this)" ondragover="allowDrop(event,this)" value="8月">
+                  <b id="mon">八月</b>
+                </div>
+                <div id="September" ondrop="drop(this)" ondragover="allowDrop(event,this)" value="9月">
+                  <b id="mon">九月</b>
+                </div>
+                <div id="October" ondrop="drop(this)" ondragover="allowDrop(event,this)" value="10月">
+                  <b id="mon">十月</b>
+                </div >
+                <div id="November" ondrop="drop(this)" ondragover="allowDrop(event,this)" value="11月">
+                  <b id="mon" style="width:55px;">十一月</b>
+                </div>
+                <div id="December" ondrop="drop(this)" ondragover="allowDrop(event,this)" value="12月">
+                  <b id="mon" style="width:55px;">十二月</b>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="Maintenance_new" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content" style="width: 400px; height:auto; left:35px;top: 230px;">
+      <div class="modal-header">
+        <button class="close" aria-label="Close" onclick="new_hide()" style="line-height: 0;padding-top: 3px;">×</button>
+      </div>
+      <div class="modal-body" style="height: 75px;margin-top: 10px;">
+        <span>保养项：</span>
+        <input type="text" id="add_mte" placeholder="请输入当前设备的保养项" value="">
+      </div>
+      <div class="modal-footer" style="padding: 5px">
+        <button class="btn btn-info" onclick="add_maintenance()">确定</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 初始函数
+  $(function(){
+    var arr = [];
+    arr.push("电路、电气部分老化程度,清洗冷却器铜管内外壁,检查液压油清洁度,检查液压油清洁度");
+    initLoadingMaintenance(arr);
+  });
+  // 动态添加保养项函数
+  function initLoadingMaintenance(ArrItem) {
+    for (var i in ArrItem){
+      var new_arr = ArrItem[i];
+      var arr_maintenance = new_arr.split(',');
+      for(var j=0; j<arr_maintenance.length; j++){
+        var pre_maintenance ="<div style='float: left;position: relative;'><img class='deleteBtn' style='float: right; position: relative; right: 19px; top:13px; display: none;' src='img/deleteBtn.png' height='16' width='16'  onclick=\"deleteItem(this)\"/><span id='initNewMte' class='btn mteValue' draggable='true' ondragstart='drag(this)'>"+arr_maintenance[j]+"</span></div>";
+        $(".span_style").append(pre_maintenance);
+      }
+    }
+  }
+  // 保养项添加模态框关闭函数
+  function new_hide() {
+    $("#Maintenance_new").modal('hide');
+  }
+  // 保养项添加至页面函数
+  function add_maintenance() {
+    var newAdd_pre = $("#add_mte").val();
+    if (newAdd_pre ==""){
+      alert("请输入保养项名称！")
+    }else{
+      var isSure = confirm("确定添加新保养项："+ newAdd_pre +"？");
+      if (isSure){
+        $("#Maintenance_new").modal('hide');
+        var pre_maintenance = "<div style='float: left;position: relative;'><img class='deleteBtn' style='float: right; position: relative; right: 19px; top:13px; display: none;' src='img/deleteBtn.png' height='16' width='16'  onclick=\"deleteItem(this)\"/><span id='initNewMte' class='btn mteValue' draggable='true' ondragstart='drag(this)'>"+newAdd_pre+"</span></div>";
+        $(".span_style").append(pre_maintenance);
+        $("#add_mte").val("");
+      }
+    }
+  }
+
+  // 删除按钮函数组
+  function showDeleteBtn() {
+    $("#showDelBtn").toggleClass('active');
+    var show = $(".deleteBtn").css('display');
+    if( show === 'block'){
+      $(".deleteBtn").css('display','none');
+      $("#showDelBtn").html("删除");
+    }else if( show === 'none'){
+      $(".deleteBtn").css('display','block');
+      $("#showDelBtn").html("取消删除");
+    }
+  }
+  function deleteItem(del) {
+    var id_name = $(del).siblings(".mteValue").html();
+    var isRight = confirm("你确定删除："+id_name+" 保养项？");
+    if (isRight) {
+      $(del).parent().remove();
+    }
+  }
+  
+  // 拖拽功能函数组
+  var dragged_name ;
+  var area_id ;
+  var months_name ;
+  var z = 0;
+  function allowDrop(e,t) {
+    e.preventDefault();
+    area_id = $(t).attr("id");
+    months_name =$(t).children("#mon").html();
+  }
+  function drag(s) {
+    var show = $(".deleteBtn").css('display');
+    if (show ==='block'){
+      alert("请先取消删除操作！");
+    } else{
+      dragged_name = $(s).html();
+    }
+  }
+  function addHtml() {
+    var html_content = '';
+    html_content=`<div style='float: left;position: relative;'><img class="deleteBtn" style='float: right; position: relative; right: 10px; display: none;' src='img/deleteBtn.png' height='16' width='16' onclick="deleteItem(this)"/><span id='newAddMte' class='btn mteValue' draggable='true' ondragstart='drag(this)' ondragend='dragend(this)'>`+dragged_name+`</span></div>`;
+    var new_target = "#"+area_id;
+    $(new_target).append(html_content);
+  }
+  function drop(r) {
+    var isTrue = confirm("确定将"+ dragged_name +"移动到"+ months_name +"?");
+    if (isTrue){
+      addHtml();
+      z=1;
+    }
+  }
+  function dragend(g) {
+    var show = $(".deleteBtn").css('display');
+    if (show ==='block'){
+      return 0;
+    } else if ( z===1 ){
+      $(g).parent().remove();
+      z=0;
+    }
+  }
+</script>
+</body>
+</html>

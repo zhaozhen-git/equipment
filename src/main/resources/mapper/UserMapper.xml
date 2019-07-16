@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jc.equipment.dao.UserMapper">
+
+    <select id="findUserName" resultType="map">
+        select u.user_ID,u.user_password,r.name from eq_user u
+        left join user_role ur on u.user_ID = ur.user_ID left join role r on ur.role_ID = r.id where u.user_ID = #{username}
+    </select>
+
+    <select id="getDepartmentUser" resultType="map">
+        select * from eq_user where user_departmentID = #{departmentID}
+    </select>
+
+    <select id="getUserList" resultType="map">
+        SELECT u.user_ID,u.user_name,d.department_name,d.department_ID,r.id,r.name,u.user_type FROM eq_user u
+	    LEFT JOIN user_role ur ON u.user_ID = ur.user_ID
+	    LEFT JOIN role r ON ur.role_ID = r.id
+	    LEFT JOIN eq_department d ON u.user_departmentID = d.department_ID
+        <if test="username!=null and username!=''">
+            where u.user_ID like CONCAT('%',#{username},'%') or u.user_name like CONCAT('%',#{username},'%') or d.department_name like CONCAT('%',#{username},'%')
+        </if>
+    </select>
+
+    <select id="getRoleList" resultType="map">
+        select * from role
+    </select>
+
+    <insert id="insertUser">
+        insert into eq_user(user_ID,user_name,user_departmentID,user_type,user_password)
+        values(#{user_ID},#{user_name},#{department},#{user_type},'123')
+    </insert>
+
+    <insert id="insertRole">
+        insert into user_role(user_ID,role_ID) values(#{user_ID},#{user_role})
+    </insert>
+
+    <update id="updateUser">
+        update eq_user set user_name = #{user_name},user_departmentID = #{department},user_type = #{user_type} where user_ID = #{user_ID}
+    </update>
+
+    <update id="updateRole">
+        update user_role set role_ID = #{user_role} where user_ID = #{user_ID}
+    </update>
+
+    <select id="boolUser" resultType="int">
+        select count(*) from eq_user where user_ID = #{user_ID}
+    </select>
+
+    <delete id="deleteUser">
+        delete from eq_user where user_ID in
+        <foreach collection="list" item="li" open="("
+                 separator="," close=")">
+            #{li.ID}
+        </foreach>
+    </delete>
+
+    <select id="getDepartmentID" resultType="String">
+        select department_ID from eq_department where department_name = #{department}
+    </select>
+
+    <insert id="info">
+        insert into eq_user(user_ID,user_name,user_password,user_departmentID,user_type) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.user_id},#{item.user_name},'123',#{item.departmentID},'0')
+        </foreach>
+    </insert>
+
+    <insert id="infoRole">
+        insert into user_role(user_ID,role_ID) values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.user_id},'2')
+        </foreach>
+    </insert>
+
+    <select id="getUserPassword" resultType="String">
+        select user_password from eq_user where user_ID = #{user}
+    </select>
+
+    <update id="changePassword">
+        update eq_user set user_password=#{pass2} where user_ID = #{user}
+    </update>
+</mapper>
