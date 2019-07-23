@@ -1070,7 +1070,9 @@ function findEquipment() {
     var text = $("#text").val();
     if(text!=undefined && text!=""){
         $(".tbody").css("display","none");
-        $("#"+text).css("display","");
+        //模糊查询
+        $("tbody[id^="+text+"]").css("display","");
+        // $("#"+text).css("display","");
         $("#all").css("display","");
     }else{
         $(".tbody").css("display","");
