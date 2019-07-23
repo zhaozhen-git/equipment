@@ -336,7 +336,7 @@ window.onload=function () {
             ]
             , id: 'waitReload'
             , page: false
-            , height:730
+            , height:800
             , done: function () {
                 element.render();
             }

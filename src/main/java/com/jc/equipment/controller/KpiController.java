@@ -68,6 +68,60 @@ public class KpiController {
             //list3：保养维修
             List<Map<String,Object>> list3 = kpiService.getCareRepair();
 
+            //将list1中得保养项之间得逗号改成分号
+            if(list1.size()!=0){
+                for(int i =0;i<list1.size();i++){
+                    String data = "";
+                    if(list1.get(i).containsKey("carePlans_Jan")){
+                        data = list1.get(i).get("carePlans_Jan").toString().replaceAll(",",";");
+                        list1.get(i).put("carePlans_Jan",data);
+                    }
+                    if(list1.get(i).containsKey("carePlans_Feb")){
+                        data = list1.get(i).get("carePlans_Feb").toString().replaceAll(",",";");
+                        list1.get(i).put("carePlans_Feb",data);
+                    }
+                    if(list1.get(i).containsKey("carePlans_March")){
+                        data = list1.get(i).get("carePlans_March").toString().replaceAll(",",";");
+                        list1.get(i).put("carePlans_March",data);
+                    }
+                    if(list1.get(i).containsKey("carePlans_April")){
+                        data = list1.get(i).get("carePlans_April").toString().replaceAll(",",";");
+                        list1.get(i).put("carePlans_April",data);
+                    }
+                    if(list1.get(i).containsKey("carePlans_May")){
+                        data = list1.get(i).get("carePlans_May").toString().replaceAll(",",";");
+                        list1.get(i).put("carePlans_May",data);
+                    }
+                    if(list1.get(i).containsKey("carePlans_June")){
+                        data = list1.get(i).get("carePlans_June").toString().replaceAll(",",";");
+                        list1.get(i).put("carePlans_June",data);
+                    }
+                    if(list1.get(i).containsKey("carePlans_July")){
+                        data = list1.get(i).get("carePlans_July").toString().replaceAll(",",";");
+                        list1.get(i).put("carePlans_July",data);
+                    }
+                    if(list1.get(i).containsKey("carePlans_August")){
+                        data = list1.get(i).get("carePlans_August").toString().replaceAll(",",";");
+                        list1.get(i).put("carePlans_August",data);
+                    }
+                    if(list1.get(i).containsKey("carePlans_Sept")){
+                        data = list1.get(i).get("carePlans_Sept").toString().replaceAll(",",";");
+                        list1.get(i).put("carePlans_Sept",data);
+                    }
+                    if(list1.get(i).containsKey("carePlans_Oct")){
+                        data = list1.get(i).get("carePlans_Oct").toString().replaceAll(",",";");
+                        list1.get(i).put("carePlans_Oct",data);
+                    }
+                    if(list1.get(i).containsKey("carePlans_Nov")){
+                        data = list1.get(i).get("carePlans_Nov").toString().replaceAll(",",";");
+                        list1.get(i).put("carePlans_Nov",data);
+                    }
+                    if(list1.get(i).containsKey("carePlans_Dec")){
+                        data = list1.get(i).get("carePlans_Dec").toString().replaceAll(",",";");
+                        list1.get(i).put("carePlans_Dec",data);
+                    }
+                }
+            }
 
             //将list2中得零件全部改成零件名
             if(list2.size()!=0){

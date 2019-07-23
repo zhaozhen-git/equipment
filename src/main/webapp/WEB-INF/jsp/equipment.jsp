@@ -514,6 +514,13 @@
 </div>
 
 
+<div id="outerdiv" style="position:fixed;top:0;left:0;background:rgba(0,0,0,0.7);z-index:999;width:100%;height:100%;display:none;">
+    <div id="innerdiv" style="position:absolute;">
+        <img id="bigimg" style="border:5px solid #fff;" src="" />
+    </div>
+</div>
+
+
 <div style="display: none" id="care_add">
     <form class="layui-form" action="" style="margin: 20px">
         <div class="layui-form-item">

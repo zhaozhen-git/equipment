@@ -22,7 +22,7 @@ layui.use(['table','layer','form','upload','element'], function() {
         ]
         , id: 'partReload'
         , page: false
-        , height:730
+        , height:800
     });
 
 

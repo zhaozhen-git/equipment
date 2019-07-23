@@ -72,8 +72,13 @@ layui.use(['table','layer','form','upload','element'], function() {
                     yearTd+='<tr><td rowspan="2">实际</td>'+data.split("+")[0]+'</tr>';
                     yearTd+='<tr>'+data.split("+")[1]+'</tr></tbody>';
                 }else{
-                    yearTd+='<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
-                    yearTd+='<tr><td rowspan="2">实际</td>'+'<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'+'<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></tbody>';
+                    var html1 = "";
+                    for(firstTime;firstTime<=year;firstTime++){
+                        html1+='<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>';
+                    }
+                    yearTd+=html1+'</tr>';
+                    yearTd+='<tr><td rowspan="2">实际</td>'+html1+'</tr>';
+                    yearTd+='<tr>'+html1+'</tr></tbody>';
                 }
 
             }

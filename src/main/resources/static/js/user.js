@@ -139,7 +139,7 @@ layui.use(['table','layer','form','upload','element'], function() {
         ]
         , id: 'textReload'
         , page: false
-        , height:730
+        , height:800
     });
 
 
