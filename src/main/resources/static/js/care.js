@@ -1,111 +1,172 @@
 var node;
 var index;
+var photo="";
 
 //添加维修单
-function addRepair(carePlans_equipmentID,year,month,department_name,department_ID) {
+function addRepair(carePlans_equipmentID,year,month) {
     layui.use('layer',function () {
         var layer = layui.layer;
         $("#equipment_ID").val(carePlans_equipmentID);
-        $("#department_name").val(department_name);
-        $("#department_ID").val(department_ID);
         $("#year").val(year);
-        $("#user_name").val(username);
-        $("#user_ID").val(id);
         $("#month").val(month);
         node = layer.open({
             title: '添加维修单'
             , type: 1
             , shift: 4
-            , area: ['800px', '500px'] //宽高
+            , area: ['800px', '600px'] //宽高
             , content: $('#repair_add')
             ,cancel: function(index, layero){
+                $("#photo").html("");
+                photo = "";
                 layer.close(node);
             }
         });
     })
 }
+// function addRepair(carePlans_equipmentID,year,month,department_name,department_ID) {
+//     layui.use('layer',function () {
+//         var layer = layui.layer;
+//         $("#equipment_ID").val(carePlans_equipmentID);
+//         $("#department_name").val(department_name);
+//         $("#department_ID").val(department_ID);
+//         $("#year").val(year);
+//         $("#user_name").val(username);
+//         $("#user_ID").val(id);
+//         $("#month").val(month);
+//         node = layer.open({
+//             title: '添加维修单'
+//             , type: 1
+//             , shift: 4
+//             , area: ['800px', '500px'] //宽高
+//             , content: $('#repair_add')
+//             ,cancel: function(index, layero){
+//                 layer.close(node);
+//             }
+//         });
+//     })
+// }
+
+
+
+// function cancel(carePlans_equipmentID,year,month) {
+//     layui.use(['layer','table'],function () {
+//         var layer = layui.layer;
+//         var table = layui.table;
+//         //完成对应得保养项
+//         node = layer.confirm('是否撤销该条的维修单', {
+//             btn: ['确定', '取消'], title: "完成", btn1: function (index, layero) {
+//                 $.ajax({
+//                     type: "post",
+//                     url: 'cancelRepairBill?carePlans_equipmentID=' + carePlans_equipmentID + '&year='+ year + '&month='+month,
+//                     dataType: "json",
+//                     async: false,
+//                     success: function (data) {
+//                         layer.close(node);
+//                         layer.msg('成功', {icon: 1});
+//                         table.reload('textReload', {
+//                             url: '/getWaitCare?userID=' + id,
+//                             method: 'post',
+//                         });
+//                         table.reload('repairRecord', {
+//                             url: '/getCareRecord?userID=' + id,
+//                             method: 'post',
+//                         });
+//                     }
+//                 })
+//             },
+//             btn2: function (index, layero) {
+//                 layer.close(node);
+//                 table.reload('textReload', {
+//                     url: '/getWaitCare?userID=' + id,
+//                     method: 'post',
+//                 });
+//             }
+//         });
+//     })
+// }
+
 
 //已维修单
-function look(carePlans_equipmentID,year,month) {
-    layui.use(['layer','form'],function () {
-        var layer = layui.layer;
-        var form = layui.form;
-        //得到对应得维修单
-        $.ajax({
-                type: "post",
-                url: 'LookRepairPlans?carePlans_equipmentID='+carePlans_equipmentID + '&year='+year+'&month='+month,
-                dataType: "json",
-                async: false,
-                success: function (data) {
-                    var data = data.list;
-                    $("#look_year").val(year);
-                    $("#look_month").val(month);
-                    $("#equipmentID").val(data[0].repairPlans_equipmentID);
-                    $("#departmentName").val(data[0].department_name);
-                    $("#userName").val(data[0].user_name);
-                    $("#date1").val(data[0].repairPlans_year);
-                    $("#repairDes").val(data[0].repairPlans_des);
-                    $("#repair_reason").val(data[0].repairPlans_reason);
-                    $("#repairOperator").val(data[0].operator);
-                    $("#repairDate").val(data[0].repairPlans_successDate);
-                    $("#repair_part").val(data[0].partName);
-                    form.render();
-                    node = layer.open({
-                        title: '查看维修单'
-                        , type: 1
-                        , shift: 4
-                        , area: ['800px', '750px'] //宽高
-                        , content: $('#repair_look')
-                        ,cancel: function(index, layero){
-                            layer.close(node);
-                        }
-                    });
-                }
-        })
-    })
-}
+// function look(carePlans_equipmentID,year,month) {
+//     layui.use(['layer','form'],function () {
+//         var layer = layui.layer;
+//         var form = layui.form;
+//         //得到对应得维修单
+//         $.ajax({
+//                 type: "post",
+//                 url: 'LookRepairPlans?carePlans_equipmentID='+carePlans_equipmentID + '&year='+year+'&month='+month,
+//                 dataType: "json",
+//                 async: false,
+//                 success: function (data) {
+//                     var data = data.list;
+//                     $("#look_year").val(year);
+//                     $("#look_month").val(month);
+//                     $("#equipmentID").val(data[0].repairPlans_equipmentID);
+//                     $("#departmentName").val(data[0].department_name);
+//                     $("#userName").val(data[0].user_name);
+//                     $("#date1").val(data[0].repairPlans_year);
+//                     $("#repairDes").val(data[0].repairPlans_des);
+//                     $("#repair_reason").val(data[0].repairPlans_reason);
+//                     $("#repairOperator").val(data[0].operator);
+//                     $("#repairDate").val(data[0].repairPlans_successDate);
+//                     $("#repair_part").val(data[0].partName);
+//                     form.render();
+//                     node = layer.open({
+//                         title: '查看维修单'
+//                         , type: 1
+//                         , shift: 4
+//                         , area: ['800px', '750px'] //宽高
+//                         , content: $('#repair_look')
+//                         ,cancel: function(index, layero){
+//                             layer.close(node);
+//                         }
+//                     });
+//                 }
+//         })
+//     })
+// }
 
 
 
 //查看维修单
-function lookSuccess(carePlans_equipmentID,year,month) {
-    layui.use(['layer','form'],function () {
-        var layer = layui.layer;
-        var form = layui.form;
-        //得到对应得维修单
-        $.ajax({
-            type: "post",
-            url: 'LookRepairPlans?carePlans_equipmentID='+carePlans_equipmentID + '&year='+year+'&month='+month,
-            dataType: "json",
-            async: false,
-            success: function (data) {
-                var data = data.list;
-                $("#look_year").val(year);
-                $("#look_month").val(month);
-                $("#equipmentID").val(data[0].repairPlans_equipmentID);
-                $("#departmentName").val(data[0].department_name);
-                $("#userName").val(data[0].user_name);
-                $("#date1").val(data[0].repairPlans_year);
-                $("#repairDes").val(data[0].repairPlans_des);
-                $("#repair_reason").val(data[0].repairPlans_reason);
-                $("#repairOperator").val(data[0].operator);
-                $("#repairDate").val(data[0].repairPlans_successDate);
-                $("#success").css("display","none");
-                form.render();
-                node = layer.open({
-                    title: '查看维修单'
-                    , type: 1
-                    , shift: 4
-                    , area: ['800px', '600px'] //宽高
-                    , content: $('#repair_look')
-                    ,cancel: function(index, layero){
-                        layer.close(node);
-                    }
-                });
-            }
-        })
-    })
-}
+// function lookSuccess(carePlans_equipmentID,year,month) {
+//     layui.use(['layer','form'],function () {
+//         var layer = layui.layer;
+//         var form = layui.form;
+//         //得到对应得维修单
+//         $.ajax({
+//             type: "post",
+//             url: 'LookRepairPlans?carePlans_equipmentID='+carePlans_equipmentID + '&year='+year+'&month='+month,
+//             dataType: "json",
+//             async: false,
+//             success: function (data) {
+//                 var data = data.list;
+//                 $("#look_year").val(year);
+//                 $("#look_month").val(month);
+//                 $("#equipmentID").val(data[0].repairPlans_equipmentID);
+//                 $("#departmentName").val(data[0].department_name);
+//                 $("#userName").val(data[0].user_name);
+//                 $("#date1").val(data[0].repairPlans_year);
+//                 $("#repairDes").val(data[0].repairPlans_des);
+//                 $("#repair_reason").val(data[0].repairPlans_reason);
+//                 $("#repairOperator").val(data[0].operator);
+//                 $("#repairDate").val(data[0].repairPlans_successDate);
+//                 $("#success").css("display","none");
+//                 form.render();
+//                 node = layer.open({
+//                     title: '查看维修单'
+//                     , type: 1
+//                     , shift: 4
+//                     , area: ['800px', '600px'] //宽高
+//                     , content: $('#repair_look')
+//                     ,cancel: function(index, layero){
+//                         layer.close(node);
+//                     }
+//                 });
+//             }
+//         })
+//     })
+// }
 
 //完成
 function success(carePlans_equipmentID,year,month,data) {
@@ -149,16 +210,16 @@ function success(carePlans_equipmentID,year,month,data) {
 
 
 //撤销维修单
-function cancel(carePlans_equipmentID,year,month) {
+function cancel(carePlans_equipmentID,year,month,equipment_file) {
     layui.use(['layer','table'],function () {
         var layer = layui.layer;
         var table = layui.table;
         //完成对应得保养项
-        node = layer.confirm('是否撤销选中的维修单', {
+        node = layer.confirm('是否撤销该条的维修单', {
             btn: ['确定', '取消'], title: "完成", btn1: function (index, layero) {
                 $.ajax({
                     type: "post",
-                    url: 'cancelRepairBill?carePlans_equipmentID=' + carePlans_equipmentID + '&year='+ year + '&month='+month,
+                    url: 'cancelPhoto?equipmentID=' + carePlans_equipmentID + '&year='+ year + '&month='+ month + '&equipment_file=' + equipment_file,
                     dataType: "json",
                     async: false,
                     success: function (data) {
@@ -229,12 +290,13 @@ function unSuccess(careRecord_equipmentID,year,month) {
 
 
 window.onload=function () {
-    layui.use(['table','layer','form','element','laydate'], function() {
+    layui.use(['table','layer','form','element','laydate','upload'], function() {
         var table = layui.table;
         var layer = layui.layer;
         var form = layui.form;
         var element = layui.element;
         var laydate = layui.laydate;
+        var upload = layui.upload;
 
         // //日期
         laydate.render({
@@ -242,14 +304,35 @@ window.onload=function () {
         });
 
 
+        //多图片上传
+        upload.render({
+            elem: '#photoList'
+            ,url: '/upload/'
+            ,multiple: true
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#photo').append('<img style="width: 150px;height: 100px;margin: 10px" src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img">')
+                });
+            }
+            ,done: function(res){
+                photo+=res.data.src+";";
+                //上传完毕
+            }
+        });
+
+
+
         //监听提交
         form.on('submit(demo)', function (data) {
             $.ajax({
-                url: "/repairCarePlans",
+                url: "/CareRepair?photo="+photo,
                 dataType: "json",
                 data: data.field,
                 success: function (result) {
                     layer.msg('添加成功', {icon: 1});
+                    $("#photo").html("");
+                    photo = "";
                     layer.close(node);
                     table.reload('textReload', {
                         url: '/getWaitCare?userID=' + id,
@@ -343,22 +426,24 @@ window.onload=function () {
                     , {field: 'year', title: '保养计划年份', width: 120, align: 'center'}
                     , {field: 'month', title: '保养计划时间', width: 120, align: 'center'}
                     , {field: 'data', title: '保养项', width: 500, align: 'center'}
-                    , {field: 'sign', title: '维修单', width: 120,align: 'center'
-                    , templet: function (d) {
-                        if(d.sign===0){
-                            return '<button style="background-color: #007DDB;color: white;padding: 3px" onclick="addRepair(\''+d.carePlans_equipmentID+'\',\''+d.year+'\',\''+d.month+'\',\''+d.department_name+'\',\''+d.department_ID+'\')">添加</button>';
-                        }else if(d.sign===1){
-                            return '未维修';
-                        }else if(d.sign===2){
-                            return '<button style="background-color: #FF5722;color: white;padding: 3px" onclick="look(\''+d.carePlans_equipmentID+'\',\''+d.year+'\',\''+d.month+'\')">已维修</button>';
-                        }else if(d.sign===3){
-                            return '<button style="background-color: #FF5722;color: white;padding: 3px" onclick="lookSuccess(\''+d.carePlans_equipmentID+'\',\''+d.year+'\',\''+d.month+'\')">查看</button>';
+                    , {field: 'equipment_file', title: '图片', width: 500, align: 'center',
+                    templet: function (d) {
+                        var file = "";
+                        var fileData = d.equipment_file;
+                        if(fileData!=undefined){
+                            for(var i=0;i<fileData.length;i++){
+                                file += '<image style="margin: 5px" class="big" src="'+fileData[i].filepath+'"></image>'
+                            }
+                            return file;
+                        }else{
+                            return "无";
                         }
                     }}
-                    , {field: 'data', title: '操作', width: 300,align: 'center'
+                    , {field: 'data', title: '操作', width: 400,align: 'center'
                     , templet: function (d) {
-                        var data = '<button style="background-color: #FF5722;color: white;padding: 3px;margin-right: 10px" onclick="cancel(\''+d.carePlans_equipmentID+'\',\''+d.year+'\',\''+d.month+'\')">撤销维修单</button>'
-                        data+='<button style="background-color:#007DDB;color: white;padding: 3px" onclick="success(\''+d.carePlans_equipmentID+'\',\''+d.year+'\',\''+d.month+'\',\''+d.data+'\')">完成保养</button>';
+                        var data = '<div style="margin-top:30px"><button style="background-color: #49FF0A;color: white;padding: 3px;margin-right: 10px" onclick="addRepair(\''+d.carePlans_equipmentID+'\',\''+d.year+'\',\''+d.month+'\')">添加维修</button>';
+                        data+= '<button style="background-color: #FF5722;color: white;padding: 3px;margin-right: 10px" onclick="cancel(\''+d.carePlans_equipmentID+'\',\''+d.year+'\',\''+d.month+'\',\''+d.pic+'\')">删除维修</button>';
+                        data+='<button style="background-color:#007DDB;color: white;padding: 3px" onclick="success(\''+d.carePlans_equipmentID+'\',\''+d.year+'\',\''+d.month+'\',\''+d.data+'\')">完成保养</button></div>';
                         return data;
                     }}
                 ]
@@ -390,7 +475,7 @@ window.onload=function () {
                     , {field: 'careRecord_date', title: '保养完成日期', width: 120, align: 'center'}
                     , {field: 'careRecord_date', title: '操作', width: 120,align: 'center'
                     , templet: function (d) {
-                        return '<button style="background-color:#007DDB;color: white;padding: 3px" onclick="unSuccess(\''+d.careRecord_equipmentID+'\',\''+d.careRecord_year+'\',\''+d.careRecord_month+'\')">取消完成</button>';
+                        return '<div style="margin-top:30px"><button style="background-color:#007DDB;color: white;padding: 3px" onclick="unSuccess(\''+d.careRecord_equipmentID+'\',\''+d.careRecord_year+'\',\''+d.careRecord_month+'\')">取消完成</button></div>';
                     }}
                 ]
             ]
@@ -421,4 +506,92 @@ function setPassword() {
             }
         });
     })
+}
+
+
+
+layui.use(['table','layer'],function () {
+    var table = layui.table;
+    var layer = layui.layer;
+    var active = {
+        reload: function(){
+            var demoReload = $('#demoReload');
+            //执行重载
+            var index = layer.msg("查询中，请稍后...",{icon:16});
+            var name = document.getElementById("page_1").className;
+            if(name!=""){
+                setTimeout(function () {
+                    table.reload('textReload', {
+                        where: {
+                            username:demoReload.val()
+                        }
+                    });
+                    layer.close(index);
+                },800);
+            }else{
+                setTimeout(function () {
+                    table.reload('repairRecord', {
+                        where: {
+                            username:demoReload.val()
+                        }
+                    });
+                    layer.close(index);
+                },800);
+            }
+
+        }
+    };
+
+    $('.demoTable .layui-btn').on('click', function(){
+        var type = $(this).data('type');
+        active[type] ? active[type].call(this) : '';
+    });
+})
+
+
+
+
+//图片变大变小
+$(document).on('click',".big",function (e) {
+    var _this = e.currentTarget.src;
+    imgShow("#outerdiv", "#innerdiv", "#bigimg", _this);
+})
+
+function imgShow(outerdiv, innerdiv, bigimg, _this){
+    var src = _this;//获取当前点击的pimg元素中的src属性
+    $(bigimg).attr("src", src);//设置#bigimg元素的src属性
+
+    /*获取当前点击图片的真实大小，并显示弹出层及大图*/
+    $("<img/>").attr("src", src).load(function(){
+        var windowW = $(window).width();//获取当前窗口宽度
+        var windowH = $(window).height();//获取当前窗口高度
+        var realWidth = this.width;//获取图片真实宽度
+        var realHeight = this.height;//获取图片真实高度
+        var imgWidth, imgHeight;
+        var scale = 0.8;//缩放尺寸，当图片真实宽度和高度大于窗口宽度和高度时进行缩放
+
+        if(realHeight>windowH*scale) {//判断图片高度
+            imgHeight = windowH*scale;//如大于窗口高度，图片高度进行缩放
+            imgWidth = imgHeight/realHeight*realWidth;//等比例缩放宽度
+            if(imgWidth>windowW*scale) {//如宽度扔大于窗口宽度
+                imgWidth = windowW*scale;//再对宽度进行缩放
+            }
+        } else if(realWidth>windowW*scale) {//如图片高度合适，判断图片宽度
+            imgWidth = windowW*scale;//如大于窗口宽度，图片宽度进行缩放
+            imgHeight = imgWidth/realWidth*realHeight;//等比例缩放高度
+        } else {//如果图片真实高度和宽度都符合要求，高宽不变
+            imgWidth = realWidth;
+            imgHeight = realHeight;
+        }
+        $(bigimg).css("width",imgWidth);//以最终的宽度对图片缩放
+
+        var w = (windowW-imgWidth)/2;//计算图片与窗口左边距
+        var h = (windowH-imgHeight)/2;//计算图片与窗口上边距
+        $(innerdiv).css({"top":h, "left":w});//设置#innerdiv的top和left属性
+        $(outerdiv).fadeIn("fast");//淡入显示#outerdiv及.pimg
+    });
+
+    $(outerdiv).click(function(){//再次点击淡出消失弹出层
+        $(this).fadeOut("fast");
+    });
 }

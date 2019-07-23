@@ -12,6 +12,8 @@ public interface CarePlansMapper {
 
     List<Map<String,Object>> getCarePlansList(Map<String,Object> map);
 
+    List<Map<String,Object>> getPhotoList(Map<String,Object> map);
+
     void successCarePlansState(Map<String,Object> map);
 
     void unSuccessCarePlansState(Map<String,Object> map);
@@ -24,4 +26,11 @@ public interface CarePlansMapper {
 
     void cancelRepairBill(Map<String,Object> map);
 
+    int getPhoto(Map<String,Object> map);
+
+    void updatePhoto(Map<String,Object> map);
+
+    void insertPhoto(Map<String,Object> map);
+
+    void cancelPhoto(Map<String,Object> map);
 }

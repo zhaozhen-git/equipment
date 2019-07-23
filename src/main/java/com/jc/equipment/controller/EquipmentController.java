@@ -544,8 +544,26 @@ public class EquipmentController {
         map.put("equipmentID",equipmentID);
         try{
             List<Map<String,Object>> list = equipmentService.getEquipmentTime(map);
+            List<Map<String,Object>> list1 = equipmentService.getEquipmentRepair(map);
+            //将零件得ID变成零件项
+            if(list1.size()!=0){
+                for(int i =0;i<list1.size();i++){
+                    List<Map<String,Object>> list2 = new ArrayList<>();
+                    String partID = list1.get(i).get("repairRecord_partData").toString();
+                    String part[] = partID.split(",");
+                    for(int j=0;j<part.length;j++){
+                        Map<String,Object> map1 = new HashMap<>();
+                        map1.put("part",part[j]);
+                        list2.add(map1);
+                    }
+                    list2 = equipmentService.getPart(list2);
+                    list1.get(i).put("part",list2);
+                }
+
+            }
             JSONObject obj = new JSONObject();
             obj.put("list",list);
+            obj.put("list1",list1);
             response.setContentType("text/html;charset=UTF-8");
             response.getWriter().println(obj);
         }catch (Exception e){

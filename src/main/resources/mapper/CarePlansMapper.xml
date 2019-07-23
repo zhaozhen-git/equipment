@@ -9,9 +9,21 @@
         left join eq_equipment e on c.carePlans_equipmentID = e.equipment_ID
         left join eq_department d on e.equipment_departmentID = d.department_ID
         left join eq_user u on c.carePlans_userID = u.user_ID
+        where
         <if test="userID!='' and userID!=null and userID!='901001'">
-            where carePlans_userID = #{userID}
+            carePlans_userID = #{userID}
         </if>
+        <if test="userID!='' and userID!=null and userID='901001'">
+            1 = 1
+        </if>
+        <if test="username!='' and username!=null">
+            and c.carePlans_equipmentID like CONCAT('%',#{username},'%') or d.department_name like CONCAT('%',#{username},'%') or u.user_name like CONCAT('%',#{username},'%')
+        </if>
+
+    </select>
+
+    <select id="getPhotoList" resultType="map">
+        select * from eq_photo
     </select>
 
     <update id="successCarePlansState">
@@ -35,8 +47,12 @@
         select c.*,u.user_name,d.department_name from eq_carerecord c
         left join eq_user u on c.careRecord_userID = u.user_ID
         left join eq_department d on u.user_departmentID = d.department_ID
+        where c.careRecord_userID = "901001"
         <if test="userID!=null and userID!='' and userID!='901001'">
-            careRecord_userID = #{userID}
+            and c.careRecord_userID = #{userID}
+        </if>
+        <if test="username!=null and username!=''">
+            and c.careRecord_equipmentID like CONCAT('%',#{username},'%') or d.department_name like CONCAT('%',#{username},'%') or u.user_name like CONCAT('%',#{username},'%')
         </if>
     </select>
 
@@ -45,4 +61,19 @@
         where repairPlans_equipmentID = #{carePlans_equipmentID} and repairPlans_careYear=#{year} and repairPlans_careMonth=#{month}
     </delete>
 
+    <select id="getPhoto" resultType="int">
+        select count(*) from eq_photo where equipmentID = #{equipmentID} and year = #{year} and month = #{month}
+    </select>
+
+    <update id="updatePhoto">
+        update eq_photo set photo = #{photo},remark = #{repairReason} where equipmentID = #{equipmentID} and year = #{year} and month = #{month}
+    </update>
+
+    <insert id="insertPhoto">
+        insert into eq_photo(equipmentID,photo,remark,year,month) values(#{equipmentID},#{photo},#{repairReason},#{year},#{month})
+    </insert>
+
+    <delete id="cancelPhoto">
+        delete from eq_photo where equipmentID = #{equipmentID} and year = #{year} and month = #{month}
+    </delete>
 </mapper>

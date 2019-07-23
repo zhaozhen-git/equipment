@@ -18,7 +18,13 @@ public interface KpiMapper {
 
     List<Map<String,Object>> getRepairList();
 
+    List<Map<String,Object>> getCareRepair();
+
     List<Map<String,Object>> getCare(Map<String,Object> map);
 
     String getSuccess(Map<String,Object> map);
+
+    List<Map<String,Object>> getPartName(List<Map<String,Object>> list);
+
+    String getName(Map<String,Object> map);
 }

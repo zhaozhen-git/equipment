@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 @Controller
@@ -106,17 +108,19 @@ public class CarePlansController {
     @RequestMapping("/getWaitCare")
     public Map<String,Object> getWaitCare(HttpServletRequest request){
         String userID = request.getParameter("userID");
+        String username = request.getParameter("username");
         Calendar cale = Calendar.getInstance();
         int year = cale.get(Calendar.YEAR);
         int month = cale.get(Calendar.MONTH) + 1;
         Map<String,Object> map = new HashMap<>();
         map.put("userID",userID);
+        map.put("username",username);
         Map<String,Object> resultMap = new HashMap<>();
         try{
             //得到设备保养项计划
             List<Map<String,Object>> list = carePlansService.getCarePlansList(map);
             //得到设备得维修单
-            List<Map<String,Object>> repairList = repairPlansService.getRepairPlansList(map);
+            List<Map<String,Object>> repairList = carePlansService.getPhotoList(map);
             //将小于当年得数据放在list1中
             List<Map<String,Object>> list1 = new ArrayList<>();
             //将等于当年得数据放在list2中
@@ -134,25 +138,38 @@ public class CarePlansController {
             //处理跟今年一样得数据
             List<Map<String,Object>> list4 = getBig(list2,month);
             list3.addAll(list4);
-            if(repairList.size()!=0){
-                for(int j=0;j<repairList.size();j++){
-                    String repairPlans_equipmentID = String.valueOf(repairList.get(j).get("repairPlans_equipmentID"));
-                    String repairPlans_year = String.valueOf(repairList.get(j).get("repairPlans_careYear"));
-                    String repairPlans_month = String.valueOf(repairList.get(j).get("repairPlans_careMonth"));
-                    for(int k=0;k<list3.size();k++){
+            if(repairList.size()!=0) {
+                for (int j = 0; j < repairList.size(); j++) {
+                    String repairPlans_equipmentID = String.valueOf(repairList.get(j).get("equipmentID"));
+                    String repairPlans_year = String.valueOf(repairList.get(j).get("year"));
+                    String repairPlans_month = String.valueOf(repairList.get(j).get("month"));
+                    for (int k = 0; k < list3.size(); k++) {
+                        List<Map<String,Object>> list5 = new ArrayList<>();
                         String carePlans_equipmentID = String.valueOf(list3.get(k).get("carePlans_equipmentID"));
                         String carePlans_year = String.valueOf(list3.get(k).get("year"));
                         String carePlans_month = String.valueOf(list3.get(k).get("month"));
-                        if(repairPlans_equipmentID.equals(carePlans_equipmentID) && repairPlans_year.equals(carePlans_year) && repairPlans_month.equals(carePlans_month)){
-                            String repairPlans_state = String.valueOf(repairList.get(j).get("repairPlans_state"));
-                            if("0".equals(repairPlans_state)){
-                                list3.get(k).put("sign",1);
-                            }else if("1".equals(repairPlans_state)){
-                                list3.get(k).put("sign",2);
-                            }else if("2".equals(repairPlans_state)){
-                                list3.get(k).put("sign",3);
+                        if (repairPlans_equipmentID.equals(carePlans_equipmentID) && repairPlans_year.equals(carePlans_year) && repairPlans_month.equals(carePlans_month)) {
+                            String photo = String.valueOf(repairList.get(j).get("photo"));
+                            if (photo.length() != 0 && !"null".equals(photo)) {
+                                String fileData[] = photo.split(";");
+                                String filename = "";
+                                String filepath = "/uploadFile/";
+                                for (int s = 0; s < fileData.length; s++) {
+                                    if (fileData[s].equals("")) {
+                                        continue;
+                                    } else {
+                                        Map<String, Object> map1 = new HashMap<>();
+                                        String path = filepath + fileData[s];
+                                        filename = fileData[s].substring(36);
+                                        map1.put("filepath", path);
+                                        map1.put("filename", filename);
+                                        list5.add(map1);
+                                    }
+                                }
+                                list3.get(k).put("pic",photo);
+                                list3.get(k).put("equipment_file", list5);
+                                break;
                             }
-                            break;
                         }
                     }
                 }
@@ -602,8 +619,10 @@ public class CarePlansController {
     @RequestMapping("/getCareRecord")
     public Map<String,Object> getCareRecord(HttpServletRequest request){
         String userID = request.getParameter("userID");
+        String username = request.getParameter("username");
         Map<String,Object> map = new HashMap<>();
         map.put("userID",userID);
+        map.put("username",username);
         Map<String,Object> resultMap = new HashMap<>();
         try{
             List<Map<String,Object>> list = carePlansService.getCareRecord(map);
@@ -643,4 +662,84 @@ public class CarePlansController {
         }
     }
 
+
+    //上传保养计划维修图片
+    @RequestMapping("/CareRepair")
+    public void CareRepair(HttpServletResponse response,HttpServletRequest request){
+        String photo = request.getParameter("photo");
+        String equipmentID = request.getParameter("equipment_ID");
+        String year = request.getParameter("year");
+        String month = request.getParameter("month");
+        String repairReason = request.getParameter("repairReason");
+        Map<String,Object> map = new HashMap<>();
+        if(!"".equals(photo)){
+            if(photo.substring(photo.length()-1)==";"){
+                photo = photo.substring(0,photo.length()-1);
+            }
+            map.put("photo",photo);
+        }else{
+            map.put("photo","");
+        }
+        map.put("equipmentID",equipmentID);
+        map.put("year",year);
+        map.put("month",month);
+        map.put("repairReason",repairReason);
+        try{
+            //判断是否已经有数据
+            int x = carePlansService.getPhoto(map);
+            if(x>0){
+                carePlansService.updatePhoto(map);
+            }else{
+                carePlansService.insertPhoto(map);
+            }
+
+            JSONObject obj = new JSONObject();
+            obj.put("msg","成功");
+            response.setContentType("text/html;charset=UTF-8");
+            response.getWriter().println(obj);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 取消维修单
+     * @param request
+     * @param response
+     */
+    @RequestMapping("/cancelPhoto")
+    public void cancelPhoto(HttpServletRequest request,HttpServletResponse response) throws IOException {
+        String equipment_file = request.getParameter("equipment_file");
+        //删除本地图片
+        if(equipment_file.length()!=0){
+            String picList[] = equipment_file.split(";");
+            for(int i =0;i<picList.length;i++){
+                String filepath = "/src/main/webapp/uploadFile/";
+                filepath = filepath+picList[i];
+                File file = new File("");
+                String path = file.getCanonicalPath();
+                String filePath1 = path.replace("\\","/");
+                filepath = filePath1 + filepath;
+                File file1 = new File(filepath);
+                file1.delete();
+            }
+        }
+        String equipmentID = request.getParameter("equipmentID");
+        String year = request.getParameter("year");
+        String month = request.getParameter("month");
+        Map<String,Object> map = new HashMap<>();
+        map.put("equipmentID",equipmentID);
+        map.put("year",year);
+        map.put("month",month);
+        try{
+            carePlansService.cancelPhoto(map);
+            JSONObject obj = new JSONObject();
+            obj.put("msg","成功");
+            response.setContentType("text/html;charset=UTF-8");
+            response.getWriter().println(obj);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }

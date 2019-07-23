@@ -11,16 +11,35 @@ function look(equipmentID){
             url: 'getEquipmentTime?equipmentID='+equipmentID,
             dataType: "json",
             async: false,
-            success: function (data) {
-                var data = data.list;
-                $("timeData").html("");
+            success: function (result) {
+                var data = result.list;
+                var data1 = result.list1;
+                $("#timeData").html("");
+                $("#repairData").html("");
                 var timeLine = '<ul class="layui-timeline">';
+                var repairLine = '<ul class="layui-timeline">';
                 if(data.length!=0){
                     $.each(data,function (i,item) {
                         timeLine+='<li class="layui-timeline-item">';
                         timeLine+='<i class="layui-icon layui-timeline-axis layui-icon-circle"></i>'
                         timeLine+='<div class="layui-timeline-content layui-text"><h3 class="layui-timeline-title">实际执行日期:'+item.careRecord_date+'</h3>';
-                        timeLine+='<p>计划保养项：'+item.careRecord_care+'</p><p>计划执行时间：'+item.careRecord_year+'年'+item.careRecord_month+'</p><p>执行人：'+item.user_name+'</p></div></li>';
+                        timeLine+='<p>设备编号：'+item.careRecord_equipmentID+'</p><p>计划保养项：'+item.careRecord_care+'</p><p>计划执行时间：'+item.careRecord_year+'年'+item.careRecord_month+'</p><p>执行人：'+item.user_name+'</p>';
+                        if(item.remark!=undefined){
+                            timeLine+='<p>维修描述：'+item.remark+'</p>';
+                        }
+                        timeLine+='<blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;height: 150px;width:600px;">' + '预览图：' + '<div class="layui-upload-list" id="pic">';
+                        var file = "";
+                        if(item.photo!="" && item.photo!=undefined){
+                            var num = new Array();
+                            num = item.photo.split(";");
+                            if(num.length!=0){
+                                for(var i=0;i<num.length;i++){
+                                    file+='<image style="margin: 5px;width: 120px;" class="big" src="/uploadFile/' + num[i] + '"></image>'
+                                }
+                            }
+                        }
+                        timeLine+=file+'</div>' + '</blockquote></div></li>';
+
                     })
                     timeLine+='</ul>';
                 }else{
@@ -30,6 +49,47 @@ function look(equipmentID){
                     timeLine+='<p></p></div></li></ul>';
                 }
                 $("#timeData").html(timeLine);
+
+                //维修页
+                if(data1!=undefined && data1.length!=0){
+                    $.each(data1,function (i,item) {
+                        repairLine+='<li class="layui-timeline-item">';
+                        repairLine+='<i class="layui-icon layui-timeline-axis layui-icon-circle"></i>'
+                        repairLine+='<div class="layui-timeline-content layui-text"><h3 class="layui-timeline-title">实际执行日期:'+item.repairRecord_date+'</h3>';
+                        repairLine+='<p>设备编号：'+item.repairRecord_equipmentID+'</p><p>执行人：'+item.user_name+'</p>';
+                        if(data1[i].part.length!=0){
+                            var part = "";
+                            for(var j=0;j<data1[i].part.length;j++){
+                                //零件名字
+                                part+=data1[i].part[j].eq_partName+";";
+                            }
+                        }
+                        repairLine+='<p>更换零件：'+part+'</p>';
+                        if(item.repairRecord_des!=undefined && item.repairRecord_des!=""){
+                            repairLine+='<p>维修描述：'+item.repairRecord_des+'</p>';
+                        }
+                        repairLine+='<blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;height: 150px;width:600px;">' + '预览图：' + '<div class="layui-upload-list" id="repairPic">';
+                        var file = "";
+                        if(item.repairRecord_pic!="" && item.repairRecord_pic!=undefined){
+                            var num = new Array();
+                            num = item.repairRecord_pic.split(";");
+                            if(num.length!=0){
+                                for(var i=0;i<num.length;i++){
+                                    file+='<image style="margin: 5px;width: 120px;" class="big" src="/uploadFile/' + num[i] + '"></image>'
+                                }
+                            }
+                        }
+                        repairLine+=file+'</div>' + '</blockquote></div></li>';
+
+                    })
+                    repairLine+='</ul>';
+                }else{
+                    repairLine+='<li class="layui-timeline-item">';
+                    repairLine+='<i class="layui-icon layui-timeline-axis layui-icon-circle"></i>'
+                    repairLine+='<div class="layui-timeline-content layui-text"><h3 class="layui-timeline-title">无数据</h3>';
+                    repairLine+='<p></p></div></li></ul>';
+                }
+                $("#repairData").html(repairLine);
                 node = layer.open({
                     title: '设备保养记录'
                     , type: 1

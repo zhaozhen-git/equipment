@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 @Controller
@@ -54,27 +56,51 @@ public class RepairPLansController {
 
     @ResponseBody
     @RequestMapping("/getWaitRepair")
-    public Map<String,Object> getWaitRepair(){
+    public Map<String,Object> getWaitRepair(HttpServletRequest request){
+        String username =request.getParameter("username");
+        Map<String,Object> map2 = new HashMap<>();
+        map2.put("username",username);
         Map<String,Object> resultMap = new HashMap<>();
         try{
-            List<Map<String,Object>> list = repairPlansService.getWaitRepair();
-            String partID = String.valueOf(list.get(0).get("repairPlans_partID"));
-            String partData[] = partID.split(",");
-            if(partData.length!=0){
-                List<Map<String,Object>> list1 = new ArrayList<>();
-                for(int i=0;i<partData.length;i++){
-                    Map<String,Object> map = new HashMap<>();
-                    map.put("partID",partData[i]);
-                    list1.add(map);
-                }
-                List<Map<String,Object>> list2 = repairPlansService.getPartName(list1);
-                if(list2.size()!=0){
-                    String s = "";
-                    for(int j=0;j<list2.size();j++){
-                        s+= list2.get(j).get("eq_partName")+",";
+            List<Map<String,Object>> list = repairPlansService.getWaitRepair(map2);
+            if(list.size()!=0){
+                for(int i=0;i<list.size();i++){
+                    List<Map<String,Object>> list1 = new ArrayList<>();
+                    List<Map<String,Object>> list3 = new ArrayList<>();
+                    List<Map<String,Object>> list2 = new ArrayList<>();
+                    String partData = String.valueOf(list.get(i).get("repairRecord_partData"));
+                    String equipmentID = String.valueOf(list.get(i).get("repairRecord_equipmentID"));
+                    if(partData.length()>0){
+                        String data[] = partData.split(",");
+                        for(int k =0;k<data.length;k++){
+                            Map<String,Object> map = new HashMap<>();
+                            map.put("data",data[k]);
+                            list2.add(map);
+                        }
+                        list3 = repairPlansService.getCare(list2);
                     }
-                    s = s.substring(0,s.length()-1);
-                    list.get(0).put("partName",s);
+                    list.get(i).put("careList",list3);
+                    String photo = String.valueOf(list.get(i).get("repairRecord_pic"));
+                    if (photo.length() != 0 && !"null".equals(photo)) {
+                        String fileData[] = photo.split(";");
+                        String filename = "";
+                        String filepath = "/uploadFile/";
+                        for (int s = 0; s < fileData.length; s++) {
+                            if (fileData[s].equals("")) {
+                                continue;
+                            } else {
+                                Map<String, Object> map1 = new HashMap<>();
+                                String path = filepath + fileData[s];
+                                filename = fileData[s].substring(36);
+                                map1.put("filepath", path);
+                                map1.put("filename", filename);
+                                list1.add(map1);
+                            }
+                        }
+                        list.get(i).put("equipment_file",list1);
+                    }else{
+                        list.get(i).put("equipment_file","");
+                    }
                 }
             }
             resultMap.put("data", list);
@@ -94,16 +120,28 @@ public class RepairPLansController {
      * @param response
      */
     @RequestMapping("/deleteRepair")
-    public void deleteRepair(HttpServletRequest request,HttpServletResponse response){
-        String repairPlans_equipmentID = request.getParameter("repairPlans_equipmentID");
-        String repairPlans_careYear = request.getParameter("repairPlans_careYear");
-        String repairPlans_careMonth = request.getParameter("repairPlans_careMonth");
+    public void deleteRepair(HttpServletRequest request,HttpServletResponse response) throws IOException {
+        String id = request.getParameter("id");
+        String repairRecord_pic = request.getParameter("repairRecord_pic");
         Map<String,Object> map = new HashMap<>();
-        map.put("repairPlans_equipmentID",repairPlans_equipmentID);
-        map.put("repairPlans_careYear",repairPlans_careYear);
-        map.put("repairPlans_careMonth",repairPlans_careMonth);
+        map.put("id",id);
+        map.put("repairRecord_pic",repairRecord_pic);
+        //删除本地图片
+        if(repairRecord_pic.length()!=0){
+            System.out.println(repairRecord_pic);
+            String picList[] = repairRecord_pic.split(";");
+            for(int i =0;i<picList.length;i++){
+                String filepath = "/src/main/webapp/uploadFile/";
+                filepath = filepath+picList[i];
+                File file = new File("");
+                String path = file.getCanonicalPath();
+                String filePath1 = path.replace("\\","/");
+                filepath = filePath1 + filepath;
+                File file1 = new File(filepath);
+                file1.delete();
+            }
+        }
         try {
-            System.out.println(map);
             repairPlansService.deleteRepair(map);
             JSONObject obj = new JSONObject();
             obj.put("msg","成功");
@@ -203,24 +241,43 @@ public class RepairPLansController {
      */
     @RequestMapping("/repairBill")
     public void repairBill(HttpServletResponse response,HttpServletRequest request){
-        String repairPlans_careYear = request.getParameter("repairPlans_careYear");
-        String repairPlans_careMonth = request.getParameter("repairPlans_careMonth");
-        String repairPlans_operatorID = request.getParameter("repairPlans_operatorID");
-        String repairPlans_equipmentID = request.getParameter("repairPlans_equipmentID");
+        //图片
+        String photo = request.getParameter("photoList");
+        String edit = request.getParameter("edit");
+        String equipmentID = request.getParameter("equipment_ID");
         String reason = request.getParameter("reason");
         String partData = request.getParameter("partData");
+        String userID = request.getParameter("userID");
         Calendar cal=Calendar.getInstance();
         String date = cal.get(Calendar.YEAR)+ "-" +(cal.get(Calendar.MONTH)+1) + "-" + cal.get(Calendar.DATE);
         Map<String,Object> map = new HashMap<>();
-        map.put("repairPlans_careYear",repairPlans_careYear);
-        map.put("repairPlans_careMonth",repairPlans_careMonth);
-        map.put("repairPlans_operatorID",repairPlans_operatorID);
-        map.put("repairPlans_equipmentID",repairPlans_equipmentID);
+        map.put("equipmentID",equipmentID);
+        if(photo.length()!=0){
+            photo = photo.replaceAll("[;]{2,}",";");
+            if(photo.substring(photo.length()-1)==";"){
+                photo = photo.substring(0,photo.length()-1);
+            }
+        }
+        map.put("photo",photo);
         map.put("reason",reason);
         map.put("date",date);
         map.put("partData",partData);
+        map.put("userID",userID);
         try{
-            repairPlansService.repairBill(map);
+            if(edit.equals("insert")){
+                int id = 0;
+                String num = repairPlansService.getNum();
+                if(num!=null){
+                    id = Integer.valueOf(num) + 1;
+                }
+                map.put("id",id);
+                repairPlansService.repairBill(map);
+            }else if(edit.equals("update")){
+                String id = request.getParameter("id");
+                map.put("id",id);
+                repairPlansService.updateBill(map);
+            }
+
             JSONObject obj = new JSONObject();
             obj.put("msg","插入成功");
             response.setContentType("text/html;charset=UTF-8");
@@ -378,6 +435,50 @@ public class RepairPLansController {
             response.getWriter().println(obj);
         }catch (Exception e){
             throw new RuntimeException("获取维修记录出错！");
+        }
+    }
+
+
+    /**
+     * 得到对应用户相应得部门设备
+     * @param response
+     * @param request
+     */
+    @RequestMapping("/equipmentList")
+    public void equipmentList(HttpServletResponse response,HttpServletRequest request){
+        String userID = request.getParameter("userID");
+        Map<String,Object> map = new HashMap<>();
+        map.put("userID",userID);
+        try{
+            List<Map<String,Object>> list = repairPlansService.getEquipmentList(map);
+            JSONObject obj = new JSONObject();
+            obj.put("list",list);
+            response.setContentType("text/html;charset=UTF-8");
+            response.getWriter().println(obj);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 联动加载零件详情
+     * @param request
+     * @param response
+     */
+    @RequestMapping("/getPartDes")
+    public void getPartDes(HttpServletRequest request,HttpServletResponse response){
+        String part = request.getParameter("part");
+        Map<String,Object> map = new HashMap<>();
+        map.put("part",part);
+        try{
+            String data = repairPlansService.getPartDes(map);
+            JSONObject obj = new JSONObject();
+            obj.put("data",data);
+            response.setContentType("text/html;charset=UTF-8");
+            response.getWriter().println(obj);
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 }

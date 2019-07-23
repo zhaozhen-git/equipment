@@ -8,11 +8,15 @@
         select eq.*,u.user_name,d.department_name,d.department_ID from eq_equipment eq
         left join eq_user u on u.user_departmentID = eq.equipment_departmentID
         left join eq_department d on u.user_departmentID = d.department_ID
+        where
         <if test="username!='901001'">
-            where u.user_ID = #{username}
+            u.user_ID = #{username}
+        </if>
+        <if test="username='901001'">
+            1=1
         </if>
         <if test="data!=null and data!=''">
-            where eq.equipment_name like CONCAT('%',#{data},'%') or d.department_name like CONCAT('%',#{data},'%') or u.user_name like CONCAT('%',#{data},'%')
+            and eq.equipment_name like CONCAT('%',#{data},'%') or d.department_name like CONCAT('%',#{data},'%') or u.user_name like CONCAT('%',#{data},'%')
         </if>
     </select>
     
@@ -337,13 +341,28 @@
 
 
     <select id="getEquipmentTime" resultType="map">
-        select c.*,u.user_name from eq_carerecord c
+        select c.*,p.photo,p.remark,u.user_name from eq_carerecord c
+        left join eq_photo p on c.careRecord_equipmentID = p.equipmentID and c.careRecord_year = p.year and c.careRecord_month = p.month
         left join eq_user u on c.careRecord_userID = u.user_ID
         where c.careRecord_equipmentID = #{equipmentID}
         order by c.careRecord_date asc
     </select>
 
+
+    <select id="getEquipmentRepair" resultType="map">
+        select r.*,u.user_name from eq_repairrecord r
+        left join eq_user u on r.repairRecord_userID = u.user_ID
+        where repairrecord_equipmentID = #{equipmentID}
+    </select>
+
     <select id="getFile" resultType="map">
         select equipment_file from eq_equipment where equipment_ID = #{equipmentID}
+    </select>
+
+    <select id="getPart" resultType="map">
+        select eq_partName from eq_part where eq_partID in
+        <foreach collection="list" open="(" close=")" separator="," item="li">
+            #{li.part}
+        </foreach>
     </select>
 </mapper>

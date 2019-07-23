@@ -30,12 +30,24 @@ public class KpiService {
         return kpiMapper.getRepairList();
     }
 
+    public List<Map<String,Object>> getCareRepair(){
+        return kpiMapper.getCareRepair();
+    }
+
     public List<Map<String,Object>> getCare(Map<String,Object> map){
         return kpiMapper.getCare(map);
     }
 
     public String getSuccess(Map<String,Object> map){
         return kpiMapper.getSuccess(map);
+    }
+
+    public List<Map<String,Object>> getPartName(List<Map<String,Object>> list){
+        return kpiMapper.getPartName(list);
+    }
+
+    public String getName(Map<String,Object> map){
+        return kpiMapper.getName(map);
     }
 
 }

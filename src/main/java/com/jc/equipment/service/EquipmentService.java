@@ -95,7 +95,15 @@ public class EquipmentService {
         return equipmentMapper.getEquipmentTime(map);
     }
 
+    public List<Map<String,Object>> getEquipmentRepair(Map<String,Object> map){
+        return equipmentMapper.getEquipmentRepair(map);
+    }
+
     public List<Map<String,Object>> getFile(Map<String,Object> map){
         return equipmentMapper.getFile(map);
+    }
+
+    public List<Map<String,Object>> getPart(List<Map<String,Object>> list){
+        return equipmentMapper.getPart(list);
     }
 }

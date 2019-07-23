@@ -6,6 +6,12 @@
     <script src="js/jquery-1.11.3.js"></script>
     <script src="layui/layui.js"></script>
     <script src="js/bootstrap.js"></script>
+    <style>
+        .layui-table-cell {
+            height: 80px;
+            line-height: 80px;
+        }
+    </style>
 </head>
 <body class="layui-layout-body">
 <div class="layui-layout layui-layout-admin">
@@ -39,10 +45,17 @@
     <div>
         <!-- 内容主体区域 -->
         <div class="layui-tab layui-tab-brief" style="padding: 10px;">
-            <ul class="layui-tab-title">
+            <ul class="layui-tab-title" style="width: 50%;display: inline-block">
                 <li id="page_1" class="layui-this">待保养列表</li>
                 <li id="page_2">保养记录</li>
             </ul>
+            <div class="demoTable" style="float: right;display: inline-block;margin-right: 20px">
+                按设备名称/部门/负责人：
+                <div class="layui-inline">
+                    <input class="layui-input" name="id" id="demoReload" autocomplete="off">
+                </div>
+                <button class="layui-btn" data-type="reload">搜索</button>
+            </div>
             <div class="layui-tab-content">
                 <div class="layui-tab-item layui-show" id="one">
                     <table id="waitCare" lay-filter="waitCare"></table>
@@ -64,46 +77,26 @@
 <!--新增维修单-->
 <div style="display: none" id="repair_add">
     <form class="layui-form" action="" style="margin: 20px">
-        <input id="department_ID" name="department_ID" style="display: none">
+        <input id="equipment_ID" name="equipment_ID" style="display:none">
         <input id="year" name="year" style="display: none">
-        <input id="user_ID" name="user_ID" style="display: none">
         <input id="month" name="month" style="display: none">
         <div class="layui-form-item">
-            <!--设备编号-->
-            <label class="layui-form-label">设备编号:</label>
-            <div class="layui-input-inline">
-                <input type="text" name="equipment_ID" id="equipment_ID" disabled="disabled" class="layui-input">
-            </div>
-
-            <!--申请部门-->
-            <label class="layui-form-label">申请部门:</label>
-            <div class="layui-input-inline">
-                <input type="text" name="department_name" id="department_name" disabled="disabled" class="layui-input">
+            <label class="layui-form-label">选择图片:</label>
+            <div class="layui-upload">
+                <button type="button" class="layui-btn" id="photoList">多图片上传</button>
+                <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;height: 150px;margin-left: 110px;width:600px;">
+                    预览图：
+                    <div class="layui-upload-list" id="photo"></div>
+                </blockquote>
             </div>
         </div>
 
         <div class="layui-form-item">
-            <!--申请人-->
-            <label class="layui-form-label">申请人:</label>
+            <label class="layui-form-label">填写备注:</label>
             <div class="layui-input-inline">
-                <input type="text" name="user_name" id="user_name" disabled="disabled" class="layui-input">
-            </div>
-
-            <!--要求完成日期-->
-            <label class="layui-form-label">要求日期:</label>
-            <div class="layui-input-inline">
-                <input type="text" name="date" id="date" placeholder="yyyy-MM-dd" autocomplete="off" class="layui-input">
+                <textarea  name="repairReason" id="repairReason" placeholder="请输入备注" class="layui-textarea" style="width: 500px"></textarea>
             </div>
         </div>
-
-        <div class="layui-form-item">
-            <!--故障描述-->
-            <label class="layui-form-label"><span style="color: red">*</span>故障描述:</label>
-            <div class="layui-input-inline">
-                <textarea  name="repairReason" id="repairReason" placeholder="请输入故障描述" class="layui-textarea" style="width: 500px"></textarea>
-            </div>
-        </div>
-
 
         <div class="layui-form-item">
             <div class="layui-input-block">
@@ -114,6 +107,11 @@
     </form>
 </div>
 
+<div id="outerdiv" style="position:fixed;top:0;left:0;background:rgba(0,0,0,0.7);z-index:999;width:100%;height:100%;display:none;">
+    <div id="innerdiv" style="position:absolute;">
+        <img id="bigimg" style="border:5px solid #fff;" src="" />
+    </div>
+</div>
 
 <!--查看维修单-->
 <div style="display: none" id="repair_look">

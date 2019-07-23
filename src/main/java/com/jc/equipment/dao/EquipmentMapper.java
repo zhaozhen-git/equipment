@@ -70,6 +70,12 @@ public interface EquipmentMapper {
     //加载设备保养记录
     List<Map<String,Object>> getEquipmentTime(Map<String,Object> map);
 
+    //加载维修记录
+    List<Map<String,Object>> getEquipmentRepair(Map<String,Object> map);
+
     //得到文件列表
     List<Map<String,Object>> getFile(Map<String,Object> map);
+
+    //得到零件项
+    List<Map<String,Object>> getPart(List<Map<String,Object>> list);
 }

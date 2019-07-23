@@ -43,18 +43,20 @@
     <div>
         <!-- 内容主体区域 -->
         <div class="layui-tab layui-tab-brief" style="padding: 10px;">
-            <div style="height: 5%;margin-left: 10px">
+            <div style="height: 5%;margin-left: 10px;display: inline-block;width: 60%">
                 <button style="width: 40px;height:20px;background-color: #007DDB"></button><label>&nbsp;计划保养项</label>
                 <span style="margin-left:30px;border-radius:50%;height: 20px;width: 20px;display: inline-block;background: #c0a16b;vertical-align: top;"></span><label>&nbsp;未完成</label>
                 <span style="margin-left:30px;border-radius:50%;height: 20px;width: 20px;display: inline-block;background: #007DDB;vertical-align: top;"></span><label>&nbsp;如期完成</label>
                 <span style="margin-left:30px;border-radius:50%;height: 20px;width: 20px;display: inline-block;background: #FF5722;vertical-align: top;"></span><label>&nbsp;延期完成</label>
-                <span style="margin-left:30px;border-bottom:20px solid #926B17;border-left: 10px solid transparent;border-right: 10px solid transparent;display: inline-block;vertical-align: top;"></span><label>&nbsp;未维修</label>
                 <span style="margin-left:30px;border-bottom:20px solid cyan;border-left: 10px solid transparent;border-right: 10px solid transparent;display: inline-block;vertical-align: top;"></span><label>&nbsp;已维修</label>
                 <span style="margin-left:30px;height:20px;width:20px;background: #00db42;display: inline-block;vertical-align: top;"></span><label>&nbsp;零件更改</label>
             </div>
+            <div style="height: 5%;margin-right: 20px;float: right;display: inline-block">
+                <input style="height: 30px;padding: 5px" type="text" placeholder="请输入设备编号" id="text"><button onclick="findEquipment()" value="查询" style="width: 60px;height: 30px;background-color: #007DDB;color: white;border: 0px solid;cursor: pointer">查询</button>
+            </div>
             <div class="layui-tab-content">
                 <div class="layui-tab-item layui-show" style=" overflow:scroll;height: 80%">
-                    <table id="kpi" lay-filter="kpi" border="1" style="border: #007DDB"></table>
+                    <table id="kpi" lay-filter="kpi" border="1" style="border: #007DDB;"></table>
                 </div>
             </div>
         </div>
@@ -68,7 +70,7 @@
 
 
 
-<div id="care_look" style="display: none">
+<div id="care_look" style="display: none;">
     <form class="layui-form" action="" style="margin: 20px">
         <input style="display: none" id="year">
         <input style="display: none" id="month">
@@ -84,21 +86,12 @@
             <div class="layui-input-inline">
                 <input type="text" name="department_name" id="department_name" disabled="disabled" class="layui-input">
             </div>
-        </div>
-
-        <div class="layui-form-item">
-            <!--保养项-->
-            <label class="layui-form-label">保养项:</label>
-            <div class="layui-input-inline">
-                <input type="text" name="care" id="care" disabled="disabled" class="layui-input">
-            </div>
 
             <!--负责人-->
             <label class="layui-form-label">负责人:</label>
             <div class="layui-input-inline">
                 <input type="text" name="user_name" id="user_name" disabled="disabled" class="layui-input">
             </div>
-
         </div>
 
         <div class="layui-form-item">
@@ -117,8 +110,34 @@
             </div>
         </div>
 
-
         <div class="layui-form-item" style="display: none" id="state2">
+            <!--保养项-->
+            <label class="layui-form-label">保养项:</label>
+            <div class="layui-input-inline">
+                <textarea type="text" name="care" id="care" style="width: 500px" disabled="disabled" class="layui-textarea"></textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item" style="display: none" id="state3">
+            <!--图片-->
+            <label class="layui-form-label">图片:</label>
+            <div class="layui-upload">
+                <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;height: 150px;margin-left: 110px;width:600px;">
+                    预览图：
+                    <div class="layui-upload-list" id="pic"></div>
+                </blockquote>
+            </div>
+        </div>
+
+        <div class="layui-form-item" style="display: none" id="state4">
+            <!--备注-->
+            <label class="layui-form-label">备注:</label>
+            <div class="layui-input-inline">
+                <textarea type="text" name="remark" id="remark" style="width: 500px" disabled="disabled" class="layui-textarea"></textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item" style="display: none" id="state5">
             <div class="layui-input-block">
                 <button class="layui-btn" lay-submit="" lay-filter="demo4">确认保养完成</button>
             </div>
@@ -126,6 +145,13 @@
     </form>
 </div>
 
+
+
+<div id="outerdiv" style="position:fixed;top:0;left:0;background:rgba(0,0,0,0.7);z-index:999;width:100%;height:100%;display:none;">
+    <div id="innerdiv" style="position:absolute;">
+        <img id="bigimg" style="border:5px solid #fff;" src="" />
+    </div>
+</div>
 
 <!--密码-->
 <div id="passwordHtml" style="display: none">
@@ -150,6 +176,50 @@
                 <button class="layui-btn" lay-submit="" lay-filter="demo7">确定</button>
                 <button type="reset" class="layui-btn layui-btn-primary">重置</button>
             </div>
+        </div>
+    </form>
+</div>
+
+
+<!--维修查看-->
+<div id="repairLook" style="display: none">
+    <form class="layui-form" action="" style="margin: 20px">
+        <div class="layui-form-item">
+            <!--设备编号-->
+            <label class="layui-form-label">设备编号:</label>
+            <div class="layui-input-inline">
+                <input type="text" id="eq_ID" disabled="disabled" class="layui-input">
+            </div>
+
+            <!--用户名-->
+            <label class="layui-form-label">用户名:</label>
+            <div class="layui-input-inline">
+                <input type="text" id="eq_name" disabled="disabled" class="layui-input">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <!--保养项-->
+            <label class="layui-form-label">更换零件:</label>
+            <div class="layui-input-inline">
+                <textarea type="text" id="eq_part" style="width: 500px" disabled="disabled" class="layui-textarea"></textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <!--备注-->
+            <label class="layui-form-label">备注:</label>
+            <div class="layui-input-inline">
+                <textarea type="text" id="eq_remark" style="width: 500px" disabled="disabled" class="layui-textarea"></textarea>
+            </div>
+        </div>
+
+        <label class="layui-form-label">图片:</label>
+        <div class="layui-upload">
+            <blockquote class="layui-elem-quote layui-quote-nm" style="margin-top: 10px;height: 150px;margin-left: 110px;width:600px;">
+                预览图：
+                <div class="layui-upload-list" id="eq_pic"></div>
+            </blockquote>
         </div>
     </form>
 </div>

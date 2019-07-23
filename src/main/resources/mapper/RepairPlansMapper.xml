@@ -25,21 +25,23 @@
     </select>
 
     <select id="getWaitRepair" resultType="map">
-        select r.*,u.user_name,d.department_name from eq_repairplans r
-        left join eq_user u on r.repairPlans_userID = u.user_ID
-        left join eq_department d on r.repairPlans_departmentID=d.department_ID
-        where r.repairPlans_state!=2
+        select r.*,u.user_name,d.department_name,d.department_ID from eq_repairrecord r
+        left join eq_user u on r.repairRecord_userID = u.user_ID
+        left join eq_department d on u.user_departmentID=d.department_ID
+        <if test="username!=null and username!=''">
+            where r.repairRecord_equipmentID like CONCAT('%',#{username},'%') or d.department_name like CONCAT('%',#{username},'%') or u.user_name like CONCAT('%',#{username},'%')
+        </if>
     </select>
 
-    <update id="deleteRepair">
-        update eq_repairplans set repairPlans_state = '0',repairPlans_successDate='',repairPlans_reason=''
-        where repairPlans_equipmentID = #{repairPlans_equipmentID} and repairPlans_careYear = #{repairPlans_careYear} and repairPlans_careMonth=#{repairPlans_careMonth}
-    </update>
+    <delete id="deleteRepair">
+        delete from eq_repairrecord
+        where id = #{id} and repairRecord_pic = #{repairRecord_pic}
+    </delete>
 
-    <update id="repairBill">
-        update eq_repairplans set repairPlans_operatorID=#{repairPlans_operatorID},repairPlans_state='1',repairPlans_successDate=#{date},repairPlans_reason=#{reason},repairPlans_partID = #{partData}
-        where repairPlans_equipmentID=#{repairPlans_equipmentID} and repairPlans_careYear=#{repairPlans_careYear} and repairPlans_careMonth=#{repairPlans_careMonth}
-    </update>
+    <insert id="repairBill">
+        insert into eq_repairrecord(id,repairRecord_equipmentID,repairRecord_des,repairRecord_date,repairRecord_userID,repairRecord_pic,repairRecord_partData)
+        values(#{id},#{equipmentID},#{reason},#{date},#{userID},#{photo},#{partData})
+    </insert>
 
     <select id="getUsername" resultType="String">
         select user_name from eq_user where user_ID = #{repairPlans_operatorID}
@@ -90,5 +92,33 @@
         <foreach collection="list" item="li" open="(" close=")" separator=",">
             #{li.partID}
         </foreach>
+    </select>
+
+    <select id="getEquipmentList" resultType="map">
+        select eq.equipment_ID,eq.equipment_name from eq_equipment eq
+        left join eq_user u on eq.equipment_departmentID = u.user_departmentID
+        <if test="userID!=null and userID!='' and userID!='901001'">
+            where u.user_ID = #{userID}
+        </if>
+    </select>
+
+    <select id="getCare" resultType="map">
+        select eq_partName,eq_partID from eq_part where eq_partID in
+        <foreach collection="list" item="li" open="(" close=")" separator=",">
+            #{li.data}
+        </foreach>
+    </select>
+
+    <update id="updateBill">
+        update eq_repairrecord set repairRecord_des = #{reason},repairRecord_date = #{date},repairRecord_pic = #{photo},repairRecord_partData = #{partData},repairRecord_userID = #{userID}
+        where repairRecord_equipmentID = #{equipmentID} and id = #{id}
+    </update>
+
+    <select id="getPartDes" resultType="String">
+        select eq_partDes from eq_part where eq_partID = #{part}
+    </select>
+
+    <select id="getNum" resultType="String">
+        select max(id) from eq_repairrecord
     </select>
 </mapper>

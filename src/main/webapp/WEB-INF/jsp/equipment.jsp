@@ -239,6 +239,28 @@
 </div>
 
 
+
+<!--查看操作记录-->
+<div style="display: none" id="timeLine">
+    <div class="layui-tab">
+        <ul class="layui-tab-title">
+            <li class="layui-this">保养</li>
+            <li>维修</li>
+        </ul>
+        <div class="layui-tab-content">
+            <!--时间线-->
+            <div class="layui-tab-item layui-show">
+                <div style="padding: 30px" id="timeData"></div>
+            </div>
+            <div class="layui-tab-item">
+                <div style="padding: 30px" id="repairData"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
 <!--编辑-->
 <div style="display: none" id="layer_edit">
     <form class="layui-form" action="" style="margin: 20px">
@@ -538,10 +560,6 @@
     </form>
 </div>
 
-<!--时间线-->
-<div style="display: none" id="timeLine">
-    <div style="padding: 30px" id="timeData"></div>
-</div>
 
 
 <script>

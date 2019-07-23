@@ -25,8 +25,8 @@ public class RepairPlansService {
         return repairPlansMapper.LookRepairPlans(map);
     }
 
-    public List<Map<String,Object>> getWaitRepair(){
-        return repairPlansMapper.getWaitRepair();
+    public List<Map<String,Object>> getWaitRepair(Map<String,Object> map){
+        return repairPlansMapper.getWaitRepair(map);
     }
 
     public void deleteRepair(Map<String,Object> map){
@@ -36,6 +36,14 @@ public class RepairPlansService {
 
     public void repairBill(Map<String,Object> map){
         repairPlansMapper.repairBill(map);
+    }
+
+    public String getNum(){
+        return repairPlansMapper.getNum();
+    }
+
+    public void updateBill(Map<String,Object> map){
+        repairPlansMapper.updateBill(map);
     }
 
     public String getUsername(Map<String,Object> map){
@@ -72,5 +80,17 @@ public class RepairPlansService {
 
     public List<Map<String,Object>> getPartName(List<Map<String,Object>> list){
         return repairPlansMapper.getPartName(list);
+    }
+
+    public List<Map<String,Object>> getEquipmentList(Map<String,Object> map){
+        return repairPlansMapper.getEquipmentList(map);
+    }
+
+    public List<Map<String,Object>> getCare(List<Map<String,Object>> list){
+        return repairPlansMapper.getCare(list);
+    }
+
+    public String getPartDes(Map<String,Object> map){
+        return repairPlansMapper.getPartDes(map);
     }
 }

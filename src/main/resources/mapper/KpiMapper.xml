@@ -20,7 +20,12 @@
     </select>
 
     <select id="getRepairList" resultType="map">
-        select * from eq_repairplans
+        select r.*,u.user_name from eq_repairrecord r
+        left join eq_user u on u.user_ID = r.repairRecord_userID
+    </select>
+
+    <select id="getCareRepair" resultType="map">
+        select * from eq_photo
     </select>
 
     <select id="getCare" resultType="map">
@@ -36,4 +41,15 @@
         where careRecord_equipmentID = #{equipmentID} and careRecord_year = #{year} and careRecord_month = #{month}
     </select>
 
+
+    <select id="getPartName" resultType="map">
+        select eq_partName from eq_part where eq_partID in
+        <foreach collection="list" item="li" separator="," close=")" open="(">
+            #{li.part}
+        </foreach>
+    </select>
+
+    <select id="getName" resultType="String">
+        select eq_partName from eq_part where eq_partID = #{part}
+    </select>
 </mapper>

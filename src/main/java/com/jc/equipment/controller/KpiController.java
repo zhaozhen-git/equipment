@@ -12,10 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 public class KpiController {
@@ -56,18 +53,35 @@ public class KpiController {
     @RequestMapping("/getKpi")
     public void getKpi(HttpServletResponse response){
         try {
-            //list->设备ID(equipment_ID),设备名称(equipment_name),部门(department_name),购买时间(equipment_date)
+            //list:设备信息
             List<Map<String,Object>> list = kpiService.getEquipmentList();
 
-            //list1->设备ID,保养年份,保养(一月份设备、二月份设备、。。。十二月份设备)，保养(一月份状态，二月份状态，。。。十二月状态)
+            //list1:保养计划
             List<Map<String,Object>> list1 = kpiService.getCareList();
 
-            //successList->保养项完成记录表
+            //successList：完成列表
             List<Map<String,Object>> successList = kpiService.getSuccessCare();
 
-            //list2->故障设备、计划年、计划月、维修零件
+            //list2：维修
             List<Map<String,Object>> list2 = kpiService.getRepairList();
 
+            //list3：保养维修
+            List<Map<String,Object>> list3 = kpiService.getCareRepair();
+
+
+            //将list2中得零件全部改成零件名
+            if(list2.size()!=0){
+                for(int i=0;i<list2.size();i++){
+                    String partID[] = String.valueOf(list2.get(i).get("repairRecord_partData")).split(",");
+                    String partName = "";
+                    for(int j=0;j<partID.length;j++){
+                        Map<String,Object> map = new HashMap<>();
+                        map.put("part",partID[j]);
+                        partName += kpiService.getName(map) + ";";
+                    }
+                    list2.get(i).put("eq_partName",partName);
+                }
+            }
 
             //将保养完成项记录得延迟与否进行判断
             if(successList.size()!=0){
@@ -79,9 +93,14 @@ public class KpiController {
                 list1 = getNewCareState(successList,list1);
             }
 
-            //将保养项和维修项合并(list1和list2)
+            //将保养项和维修项合并
             if(list1.size()!=0 && list2.size()!=0){
-                list1 = getAll(list1,list2);
+                list1 = getList(list1,list2);
+            }
+
+            //将保养项和保养维修合并(list1和list3)
+            if(list1.size()!=0 && list3.size()!=0){
+                list1 = getAll(list1,list3);
             }
 
             //同一个设备得各年记录合并
@@ -89,13 +108,35 @@ public class KpiController {
                 list1 = Merged(list1);
             }
 
+
+            //将list2里面得零件id变成零件名称
+//            if(list2.size()!=0){
+//                for(int i =0;i<list2.size();i++){
+//                    List<Map<String,Object>> list4 = new ArrayList<>();
+//                    String part = list2.get(i).get("repairRecord_partData").toString();
+//                    String data[] = part.split(",");
+//                    if(data.length!=0){
+//                        for(int j=0;j<data.length;j++){
+//                            Map<String,Object> map = new HashMap<>();
+//                            map.put("part",data[j]);
+//                            list4.add(map);
+//                        }
+//                    }
+//                    list4 = kpiService.getPartName(list4);
+//                    list2.get(i).put("partName",list4);
+//                }
+//            }
+
+
             //设备保养项和设备详情合并
             if(list.size()!=0 && list1.size()!=0){
-                list1 = getCare(list,list1);
+                list = getCare(list,list1);
             }
-            //维修得还没有搞好，谨记
+
+
+
             JSONObject obj = new JSONObject();
-            obj.put("list1",list1);
+            obj.put("list",list);
             response.setContentType("text/html;charset=UTF-8");
             response.getWriter().println(obj);
         }catch (Exception e){
@@ -230,67 +271,57 @@ public class KpiController {
 
 
     //保养项和维修项合并
-    public List<Map<String,Object>> getAll(List<Map<String,Object>> list1,List<Map<String,Object>> list2){
-        for(int i=0;i<list2.size();i++){
-            String repairPlans_successDate = String.valueOf(list2.get(i).get("repairPlans_successDate"));
-            String repairPlans_equipmentID = String.valueOf(list2.get(i).get("repairPlans_equipmentID"));
-            String repairPlans_careYear = String.valueOf(list2.get(i).get("repairPlans_careYear"));
+    public List<Map<String,Object>> getAll(List<Map<String,Object>> list1,List<Map<String,Object>> list3){
+        for(int i=0;i<list3.size();i++){
+            String equipmentID = String.valueOf(list3.get(i).get("equipmentID"));
+            String year = String.valueOf(list3.get(i).get("year"));
+            String month = String.valueOf(list3.get(i).get("month"));
             for(int j=0;j<list1.size();j++){
                 String carePlans_equipmentID = String.valueOf(list1.get(j).get("carePlans_equipmentID"));
                 String carePlans_year = String.valueOf(list1.get(j).get("carePlans_year"));
-                if(repairPlans_equipmentID.equals(carePlans_equipmentID) && repairPlans_careYear.equals(carePlans_year)){
-                    String repairPlans_state = String.valueOf(list2.get(i).get("repairPlans_state"));
-                    String repairPlans_careMonth = String.valueOf(list2.get(i).get("repairPlans_careMonth"));
-                    String repairPlans_partID = String.valueOf(list2.get(i).get("repairPlans_partID"));
-                    String month = "";
-                    switch (repairPlans_careMonth){
+                if(equipmentID.equals(carePlans_equipmentID) && year.equals(carePlans_year)){
+                    switch (month){
                         case "一月":
-                            month = "Jan";
+                            month = "JanCare";
                             break;
                         case "二月":
-                            month = "Feb";
+                            month = "FebCare";
                             break;
                         case "三月":
-                            month = "March";
+                            month = "MarchCare";
                             break;
                         case "四月":
-                            month = "April";
+                            month = "AprilCare";
                             break;
                         case "五月":
-                            month = "May";
+                            month = "MayCare";
                             break;
                         case "六月":
-                            month = "June";
+                            month = "JuneCare";
                             break;
                         case "七月":
-                            month = "July";
+                            month = "JulyCare";
                             break;
                         case "八月":
-                            month = "August";
+                            month = "AugustCare";
                             break;
                         case "九月":
-                            month = "Sept";
+                            month = "SeptCare";
                             break;
                         case "十月":
-                            month = "Oct";
+                            month = "OctCare";
                             break;
                         case "十一月":
-                            month = "Nov";
+                            month = "NovCare";
                             break;
                         case "十二月":
-                            month = "Dec";
+                            month = "DecCare";
                             break;
                     }
-                    if(!"null".equals(repairPlans_partID)){
-                        list1.get(j).put(month,5);
-                    }else{
-                        if(repairPlans_state=="0"){
-                            list1.get(j).put(month,0);
-                        }else{
-                            list1.get(j).put(month,1);
-                        }
-                    }
-                    list1.get(j).put("repairPlans_successDate",repairPlans_successDate);
+                    String photo = String.valueOf(list3.get(i).get("photo"));
+                    String remark = String.valueOf(list3.get(i).get("remark"));
+                    list1.get(j).put(month+"pic",photo);
+                    list1.get(j).put(month+"remark",remark);
                     break;
                 }
             }
@@ -299,25 +330,119 @@ public class KpiController {
     }
 
 
-    public List<Map<String,Object>> getCare(List<Map<String,Object>> list,List<Map<String,Object>> list1){
+
+    public List<Map<String,Object>> getList(List<Map<String,Object>> list,List<Map<String,Object>> list1){
         for(int i=0;i<list1.size();i++){
-            String carePlans_equipmentID = String.valueOf(list1.get(i).get("carePlans_equipmentID"));
+            String equipmentID = String.valueOf(list1.get(i).get("repairRecord_equipmentID"));
+            String date = String.valueOf(list1.get(i).get("repairRecord_date"));
+            String year = date.split("-")[0];
             for(int j=0;j<list.size();j++){
-                String equipment_ID = String.valueOf(list.get(j).get("equipment_ID"));
-                String equipment_name = String.valueOf(list.get(j).get("equipment_name"));
-                String department_name = String.valueOf(list.get(j).get("department_name"));
-                String equipment_date = String.valueOf(list.get(j).get("equipment_date"));
+                String id = String.valueOf(list.get(j).get("carePlans_equipmentID"));
+                String Year = String.valueOf(list.get(j).get("carePlans_year"));
+                if(equipmentID.equals(id) && year.equals(Year)){
+                    String month = date.split("-")[1];
+                    String month_data = "";
+                    switch (month){
+                        case "1":
+                            month_data = "JanData";
+                            break;
+                        case "2":
+                            month_data = "FebData";
+                            break;
+                        case "3":
+                            month_data = "MarchData";
+                            break;
+                        case "4":
+                            month_data = "AprilData";
+                            break;
+                        case "5":
+                            month_data = "MayData";
+                            break;
+                        case "6":
+                            month_data = "JuneData";
+                            break;
+                        case "7":
+                            month_data = "JulyData";
+                            break;
+                        case "8":
+                            month_data = "AugustData";
+                            break;
+                        case "9":
+                            month_data = "SeptData";
+                            break;
+                        case "10":
+                            month_data = "OctData";
+                            break;
+                        case "11":
+                            month_data = "NovData";
+                            break;
+                        case "12":
+                            month_data = "DecData";
+                            break;
+                    }
+                    Map<String,Object> map = new HashMap<>();
+                    List<Map<String,Object>> list2 = new ArrayList<>();
+                    if(list1.get(i).containsKey("repairRecord_des")){
+                        String repairRecord_des = String.valueOf(list1.get(i).get("repairRecord_des"));
+                        map.put("repairRecord_des",repairRecord_des);
+                    }
+                    if(list1.get(i).containsKey("repairRecord_pic")){
+                        String repairRecord_pic = String.valueOf(list1.get(i).get("repairRecord_pic"));
+                        map.put("repairRecord_pic",repairRecord_pic);
+                    }
+                    if(list1.get(i).containsKey("eq_partName")){
+                        String eq_partName = String.valueOf(list1.get(i).get("eq_partName"));
+                        map.put("eq_partName",eq_partName);
+                    }
+                    String username = String.valueOf(list1.get(i).get("user_name"));
+                    map.put("username",username);
+                    map.put("year",year);
+                    List<Map<String,Object>> list3 = new ArrayList<>();
+                    list3.add(map);
+                    list2.addAll(list3);
+                    if(list.get(j).containsKey(month_data)){
+                        //判断是否该月有数据，有数据就叠加
+                        Map<String,Object> map3 = new HashMap<>();
+                        List<Map<String,Object>> list4 = new ArrayList<>();
+                        String s[] = list.get(j).get(month_data).toString().split("=");
+                        String PIC =  s[1].split(",")[0];
+                        String YEAR = s[2].split(",")[0];
+                        String PART = s[3].split(",")[0];
+                        String DES = s[4].split(",")[0];
+                        String NAME = s[5].split("}]")[0];
+                        map3.put("repairRecord_pic",PIC);
+                        map3.put("year",YEAR);
+                        map3.put("eq_partName",PART);
+                        map3.put("repairRecord_des",DES);
+                        map3.put("username",NAME);
+                        list4.add(map3);
+                        list2.addAll(list4);
+                    }
+                    list.get(j).put(month_data,list2);
+                    break;
+                }
+            }
+        }
+        return list;
+    }
+
+
+    public List<Map<String,Object>> getCare(List<Map<String,Object>> list,List<Map<String,Object>> list1){
+        for(int i=0;i<list.size();i++){
+            String equipment_ID = String.valueOf(list.get(i).get("equipment_ID"));
+            for(int j=0;j<list1.size();j++){
+                String carePlans_equipmentID = String.valueOf(list1.get(j).get("carePlans_equipmentID"));
                 if(carePlans_equipmentID.equals(equipment_ID)){
-                    list1.get(i).put("equipment_name",equipment_name);
-                    list1.get(i).put("department_name",department_name);
-                    list1.get(i).put("equipment_date",equipment_date);
+                    Map<String,Object> map = new HashMap<>();
+                    map.put("list",list1.get(j).get("list"));
+                    list.get(i).put("list",map);
                     break;
                 }else{
                     continue;
                 }
             }
         }
-        return list1;
+        return list;
     }
 
 
