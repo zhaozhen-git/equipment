@@ -7,7 +7,7 @@
     <select id="getEquipmentList" resultType="map">
         select e.equipment_ID,e.equipment_name,e.equipment_date,d.department_name from eq_equipment e
         left join eq_department d on e.equipment_departmentID = d.department_ID
-        order by e.equipment_date asc
+        order by e.equipment_date is null,e.equipment_date asc
     </select>
 
     <select id="getCareList" resultType="map">

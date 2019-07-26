@@ -586,7 +586,7 @@ window.onload=function () {
             , cols: [
                 [
                     {type: 'checkbox', fixed: 'left'}
-                    , {field: 'equipment_ID', title: 'ID', hide: true, width: 120, align: 'center'}
+                    , {field: 'equipment_ID', title: 'ID', width: 120, align: 'center'}
                     , {field: 'department_ID', title: '部门ID', hide: true, width: 120, align: 'center'}
                     , {field: 'equipment_name', title: '设备名称', width: 200,align: 'center'}
                     , {field: 'equipment_type', title: '设备类别', width: 120,align: 'center'

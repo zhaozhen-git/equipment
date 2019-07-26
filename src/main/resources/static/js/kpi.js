@@ -73,7 +73,8 @@ layui.use(['table','layer','form','upload','element'], function() {
                     yearTd+='<tr>'+data.split("+")[1]+'</tr></tbody>';
                 }else{
                     var html1 = "";
-                    for(firstTime;firstTime<=year;firstTime++){
+                    var times = firstTime;
+                    for(times;times<=year;times++){
                         html1+='<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>';
                     }
                     yearTd+=html1+'</tr>';
